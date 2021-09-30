@@ -26,8 +26,14 @@ date <- from 14 may
 ineq dimensions 
     # age <- 18 plus all adults
     # sex 
-    # eth 
-            #ETHNICITY IN 16 CATEGORIES
+    sex=patients.sex(
+        return_expectations={
+            "rate": "universal",
+            "category": {"ratios": {"M": 0.49, "F": 0.51}},
+        }
+    ),
+    # ethnicity 
+            #16 categories
     ethnicity_16=patients.with_these_clinical_events(
         ethnicity_codes_16,
         returning="category",
@@ -59,7 +65,7 @@ ineq dimensions
     ),
 
    
-    # ETHNICITY IN 6 CATEGORIES
+    #6 categories
     ethnicity=patients.with_these_clinical_events(
         ethnicity_codes,
         returning="category",
@@ -71,6 +77,7 @@ ineq dimensions
         },
     ),
     # dep 
+    
 vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get which proportion were vaccinated 2 weeks before
     # First COVID vaccination administration codes
     covadm1_dat=patients.with_vaccination_record(
