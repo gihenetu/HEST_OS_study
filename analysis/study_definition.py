@@ -12,7 +12,7 @@ study = StudyDefinition(
     ),
 
 age=patients.age_as_of(
-        "2019-09-01",
+        "2021-09-14",
         return_expectations={
             "rate": "universal",
             "int": {"distribution": "population_ages"},
@@ -21,9 +21,9 @@ age=patients.age_as_of(
 )
 
 ###### 
-admission_date <- 
-date <- from 14 may 
-ineq dimensions 
+# admit_date <- "2021-05-14"
+# change index_date to admit_date <- from 14 may 
+# ineq dimensions 
     # age <- 18 plus all adults
     # sex 
     sex=patients.sex(
@@ -65,7 +65,7 @@ ineq dimensions
     ),
 
    
-    #6 categories
+        #6 categories
     ethnicity=patients.with_these_clinical_events(
         ethnicity_codes,
         returning="category",
@@ -76,9 +76,18 @@ ineq dimensions
             "incidence": 0.75,
         },
     ),
-    # dep 
+    # deprivation 
+        imd=patients.address_as_of(
+        "2020-02-01",
+        returning="index_of_multiple_deprivation",
+        round_to_nearest=100,
+        return_expectations={
+            "rate": "universal",
+            "category": {"ratios": {"100": 0.1, "200": 0.2, "300": 0.7}},
+        },
+    ),
     
-vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get which proportion were vaccinated 2 weeks before
+# vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get which proportion were vaccinated 2 weeks before
     # First COVID vaccination administration codes
     covadm1_dat=patients.with_vaccination_record(
         returning="date",
@@ -110,17 +119,54 @@ vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get wh
 ## comorbidities 
     # preg (compare by months)
     # BMI
-    smok
-    diab
-    hypert
-    dementia
-    LD
+#     smok
+#     diab
+#     hypert
+#     dementia
+#     LD
     
-    maybe some medications that suppress immunity
+#     immuno-suppressant medications
     
-covid testing
-covid cases
-admission due to covid
-region
-local authority
-first dose by 14 may
+# covid testing
+# covid cases
+# admission due to covid
+covid_admission_date=patients.admitted_to_hospital(
+        returning= "date_admitted" ,  # defaults to "binary_flag"
+        with_these_diagnoses=covid_codelist,  # optional
+        on_or_after="2021-05-14",
+        find_first_match_in_period=True,  
+        date_format="YYYY-MM-DD",  
+        return_expectations={"date": {"earliest": "2021-05-14"}, "incidence" : 0.25},
+   ),
+    covid_admission_primary_diagnosis=patients.admitted_to_hospital(
+        returning="primary_diagnosis",
+        with_these_diagnoses=covid_codelist,  # optional
+        on_or_after="2020-05-14",
+        find_first_match_in_period=True,  
+        date_format="YYYY-MM-DD", 
+        return_expectations={"date": {"earliest": "2021-05-14"},"incidence" : 0.25,
+            "category": {"ratios": {"U071":0.5, "U072":0.5}},
+        },
+    ),
+# region
+    region=patients.registered_practice_as_of(
+        "2020-02-01",
+        returning="nuts1_region_name",
+        return_expectations={
+            "rate": "universal",
+            "category": {
+                "ratios": {
+                    "North East": 0.1,
+                    "North West": 0.1,
+                    "Yorkshire and the Humber": 0.1,
+                    "East Midlands": 0.1,
+                    "West Midlands": 0.1,
+                    "East of England": 0.1,
+                    "London": 0.2,
+                    "South East": 0.2,
+                },
+            },
+        },
+    ),
+# local authority
+# first dose by 14 may
