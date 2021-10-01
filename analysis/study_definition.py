@@ -8,11 +8,11 @@ study = StudyDefinition(
         "incidence": 0.5,
     },
     population=patients.registered_with_one_practice_between(
-        "2019-02-01", "2021-09-29"
+        "2021-05-14", "2021-09-29"
     ),
 
 age=patients.age_as_of(
-        "2021-09-14",
+        "2021-05-14",
         return_expectations={
             "rate": "universal",
             "int": {"distribution": "population_ages"},
@@ -117,17 +117,189 @@ age=patients.age_as_of(
         date_format="YYYY-MM-DD",
     ),
 ## comorbidities 
-    # preg (compare by months)
-    # BMI
-#     smok
-#     diab
-#     hypert
+#     preg (compare by months)
+#     BMI
+     bmi=patients.most_recent_bmi(
+        between=["2010-02-01", "2020-01-31"],
+        minimum_age_at_measurement=16,
+        include_measurement_date=True,
+        include_month=True,
+        return_expectations={
+            "date": {"earliest": "2010-02-01", "latest": "2020-01-31"},
+            "float": {"distribution": "normal", "mean": 35, "stddev": 10},
+            "incidence": 0.95,
+        },
+    ),
+#     smoking
+smoking_status=patients.categorised_as(
+        {
+            "S": "most_recent_smoking_code = 'S'",
+            "E": """
+                 most_recent_smoking_code = 'E' OR (
+                   most_recent_smoking_code = 'N' AND ever_smoked
+                 )
+            """,
+            "N": "most_recent_smoking_code = 'N' AND NOT ever_smoked",
+            "M": "DEFAULT",
+        },
+        return_expectations={
+            "category": {"ratios": {"S": 0.6, "E": 0.1, "N": 0.2, "M": 0.1}}
+        },
+        most_recent_smoking_code=patients.with_these_clinical_events(
+            clear_smoking_codes,
+            find_last_match_in_period=True,
+            on_or_before="2020-01-31",
+            returning="category",
+        ),
+        ever_smoked=patients.with_these_clinical_events(
+            filter_codes_by_category(clear_smoking_codes, include=["S", "E"]),
+            on_or_before="2020-01-31",
+        ),
+    ),
+    smoking_status_date=patients.with_these_clinical_events(
+        clear_smoking_codes,
+        on_or_before="2020-01-31",
+        return_last_date_in_period=True,
+        include_month=True,
+    ),
+    
+#     respiratory disease
+    chronic_respiratory_disease=patients.with_these_clinical_events(
+        chronic_respiratory_disease_codes,
+        return_first_date_in_period=True,
+        include_month=True,
+        return_expectations={"date": {"latest": "2020-01-31"}},
+    ),
+#     asthma
+ asthma=patients.categorised_as(
+        {
+            "0": "DEFAULT",
+            "1": """
+                (
+                  recent_asthma_code OR (
+                    asthma_code_ever AND NOT
+                    copd_code_ever
+                  )
+                ) AND (
+                  prednisolone_last_year = 0 OR 
+                  prednisolone_last_year > 4
+                )
+            """,
+            "2": """
+                (
+                  recent_asthma_code OR (
+                    asthma_code_ever AND NOT
+                    copd_code_ever
+                  )
+                ) AND
+                prednisolone_last_year > 0 AND
+                prednisolone_last_year < 5
+                
+            """,
+        },
+        return_expectations={"category": {"ratios": {"0": 0.8, "1": 0.1, "2": 0.1}},},
+        recent_asthma_code=patients.with_these_clinical_events(
+            asthma_codes, between=["2017-02-01", "2020-01-31"],
+        ),
+        asthma_code_ever=patients.with_these_clinical_events(asthma_codes),
+        copd_code_ever=patients.with_these_clinical_events(
+            chronic_respiratory_disease_codes
+        ),
+        prednisolone_last_year=patients.with_these_medications(
+            pred_codes,
+            between=["2019-02-01", "2020-01-31"],
+            returning="number_of_matches_in_period",
+        ),
+    ),
+#     diabetes
+    type1_diabetes=patients.with_these_clinical_events(
+        diabetes_t1_codes,
+        on_or_before="2020-01-31",
+        return_first_date_in_period=True,
+        include_month=True,
+    ),
+    type2_diabetes=patients.with_these_clinical_events(
+        diabetes_t2_codes,
+        on_or_before="2020-01-31",
+        return_first_date_in_period=True,
+        include_month=True,
+    ),
+    unknown_diabetes=patients.with_these_clinical_events(
+        diabetes_unknown_codes,
+        on_or_before="2020-01-31",
+        return_first_date_in_period=True,
+        include_month=True,
+    ),
+
+ 
+     diabetes_type=patients.categorised_as(
+        {
+            "T1DM":
+                """
+                        (type1_diabetes AND NOT
+                        type2_diabetes) 
+                    OR
+                        (((type1_diabetes AND type2_diabetes) OR 
+                        (type1_diabetes AND unknown_diabetes AND NOT type2_diabetes) OR
+                        (unknown_diabetes AND NOT type1_diabetes AND NOT type2_diabetes))
+                        AND 
+                        (insulin_lastyear_meds > 0 AND NOT
+                        oad_lastyear_meds > 0))
+                """,
+            "T2DM":
+                """
+                        (type2_diabetes AND NOT
+                        type1_diabetes)
+                    OR
+                        (((type1_diabetes AND type2_diabetes) OR 
+                        (type2_diabetes AND unknown_diabetes AND NOT type1_diabetes) OR
+                        (unknown_diabetes AND NOT type1_diabetes AND NOT type2_diabetes))
+                        AND 
+                        (oad_lastyear_meds > 0))
+                """,
+            "UNKNOWN_DM":
+                """
+                        ((unknown_diabetes AND NOT type1_diabetes AND NOT type2_diabetes) AND NOT
+                        oad_lastyear_meds AND NOT
+                        insulin_lastyear_meds) 
+                   
+                """,
+            "NO_DM": "DEFAULT",
+        },
+
+        return_expectations={
+            "category": {"ratios": {"T1DM": 0.03, "T2DM": 0.2, "UNKNOWN_DM": 0.02, "NO_DM": 0.75}},
+            "rate" : "universal"
+
+        },
+
+ 
+        oad_lastyear_meds=patients.with_these_medications(
+            oad_med_codes, 
+            between=["2019-02-01", "2020-01-31"],
+            returning="number_of_matches_in_period",
+        ),
+        insulin_lastyear_meds=patients.with_these_medications(
+            insulin_med_codes,
+            between=["2019-02-01", "2020-01-31"],
+            returning="number_of_matches_in_period",
+        ),
+    ),
+#     hypertension
+    hypertension=patients.with_these_clinical_events(
+        hypertension_codes, return_first_date_in_period=True, include_month=True,
+        return_expectations={"date": {"latest": "2020-01-31"}},
+    ),
 #     dementia
-#     LD
+dementia=patients.with_these_clinical_events(
+        dementia, return_first_date_in_period=True, include_month=True,
+        return_expectations={"date": {"latest": "2020-01-31"}},
+    ),
+#     Learning Disabilities
     
 #     immuno-suppressant medications
     
-# covid testing
+# covid testing https://www.opencodelists.org/codelist/opensafely/covid-identification/2020-06-03/
 # covid cases
 # admission due to covid
 covid_admission_date=patients.admitted_to_hospital(
