@@ -1,5 +1,7 @@
 from cohortextractor import StudyDefinition, patients, codelist, codelist_from_csv  # NOQA
 
+index_date = "2021-05-14"
+# change index_date to admit_date <- from 14 may 
 
 study = StudyDefinition(
     default_expectations={
@@ -8,22 +10,11 @@ study = StudyDefinition(
         "incidence": 0.5,
     },
     population=patients.registered_with_one_practice_between(
-        "2021-05-14", "2021-09-29"
+        "2021-05-14", "2021-10-01"
     ),
 
-age=patients.age_as_of(
-        "2021-05-14",
-        return_expectations={
-            "rate": "universal",
-            "int": {"distribution": "population_ages"},
-        },
-    ),
-)
 
-###### 
-# index_date = "2021-05-14"
-# change index_date to admit_date <- from 14 may 
-# ineq dimensions 
+# inequalities dimensions 
     # age <- 18 plus all adults
  age = patients.age_as_of(
     "index_date",
