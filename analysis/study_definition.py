@@ -25,7 +25,7 @@ age=patients.age_as_of(
 # change index_date to admit_date <- from 14 may 
 # ineq dimensions 
     # age <- 18 plus all adults
-  age = patients.age_as_of(
+ age = patients.age_as_of(
     "index_date",
     return_expectations = {
       "rate": "universal",
@@ -34,7 +34,7 @@ age=patients.age_as_of(
     },
   ),
     # sex 
-    sex=patients.sex(
+   sex=patients.sex(
         return_expectations={
             "rate": "universal",
             "category": {"ratios": {"M": 0.49, "F": 0.51}},
@@ -42,7 +42,7 @@ age=patients.age_as_of(
     ),
     # ethnicity 
             #16 categories
-    ethnicity_16=patients.with_these_clinical_events(
+   ethnicity_16=patients.with_these_clinical_events(
         ethnicity_codes_16,
         returning="category",
         find_last_match_in_period=True,
@@ -126,6 +126,27 @@ age=patients.age_as_of(
     ),
 ## comorbidities 
 #     preg (compare by months)
+ preg_elig_group=patients.satisfying(
+        """
+        (preg_36wks_date AND sex = 'F' AND age_1 < 50) AND
+        (pregdel_pre_elig_date <= preg_36wks_date OR NOT pregdel_pre_elig_date)
+        """,
+        preg_36wks_date=patients.with_these_clinical_events(
+            codelists.preg,
+            returning="date",
+            find_last_match_in_period=True,
+            between=["elig_date - 252 days", "elig_date - 1 day"],
+            date_format="YYYY-MM-DD",
+        ),
+        # date of last delivery code recorded in 36 weeks before elig_date
+        pregdel_pre_elig_date=patients.with_these_clinical_events(
+            codelists.pregdel,
+            returning="date",
+            find_last_match_in_period=True,
+            between=["elig_date - 252 days", "elig_date - 1 day"],
+            date_format="YYYY-MM-DD",
+        ),
+    ),
 #     BMI
      bmi=patients.most_recent_bmi(
         between=["2010-02-01", "2020-01-31"],
