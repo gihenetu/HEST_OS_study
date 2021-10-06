@@ -391,5 +391,4 @@ covid_admission_date=patients.admitted_to_hospital(
                 },
             },
         },
-    ),
-
+    )
