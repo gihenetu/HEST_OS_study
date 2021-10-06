@@ -126,7 +126,7 @@ study = StudyDefinition(
         ),
     ),
 #     BMI
-     bmi=patients.most_recent_bmi(
+bmi=patients.most_recent_bmi(
         between=["2010-02-01", "2020-01-31"],
         minimum_age_at_measurement=16,
         include_measurement_date=True,
@@ -149,21 +149,21 @@ smoking_status=patients.categorised_as(
             "N": "most_recent_smoking_code = 'N' AND NOT ever_smoked",
             "M": "DEFAULT",
         },
-        return_expectations={
+return_expectations={
             "category": {"ratios": {"S": 0.6, "E": 0.1, "N": 0.2, "M": 0.1}}
         },
-        most_recent_smoking_code=patients.with_these_clinical_events(
+most_recent_smoking_code=patients.with_these_clinical_events(
             clear_smoking_codes,
             find_last_match_in_period=True,
             on_or_before="2020-01-31",
             returning="category",
         ),
-        ever_smoked=patients.with_these_clinical_events(
+ever_smoked=patients.with_these_clinical_events(
             filter_codes_by_category(clear_smoking_codes, include=["S", "E"]),
             on_or_before="2020-01-31",
         ),
     ),
-    smoking_status_date=patients.with_these_clinical_events(
+smoking_status_date=patients.with_these_clinical_events(
         clear_smoking_codes,
         on_or_before="2020-01-31",
         return_last_date_in_period=True,
@@ -171,14 +171,14 @@ smoking_status=patients.categorised_as(
     ),
     
      # Chronic heart disease codes
-    chd_group=patients.with_these_clinical_events(
+chd_group=patients.with_these_clinical_events(
         codelists.chd_cov,
         returning="binary_flag",
         on_or_before="elig_date - 1 day",
     ),
 
     # Chronic kidney disease diagnostic codes
-    ckd_group=patients.satisfying(
+ckd_group=patients.satisfying(
         """
             ckd OR
             (ckd15_date AND 
@@ -186,7 +186,7 @@ smoking_status=patients.categorised_as(
         """,
     
 #     respiratory disease
-    chronic_respiratory_disease=patients.with_these_clinical_events(
+ chronic_respiratory_disease=patients.with_these_clinical_events(
         chronic_respiratory_disease_codes,
         return_first_date_in_period=True,
         include_month=True,
