@@ -21,10 +21,18 @@ age=patients.age_as_of(
 )
 
 ###### 
-# admit_date <- "2021-05-14"
+# index_date = "2021-05-14"
 # change index_date to admit_date <- from 14 may 
 # ineq dimensions 
     # age <- 18 plus all adults
+  age = patients.age_as_of(
+    "index_date",
+    return_expectations = {
+      "rate": "universal",
+      "int": {"distribution": "population_ages"},
+      "incidence" : 0.001
+    },
+  ),
     # sex 
     sex=patients.sex(
         return_expectations={
@@ -163,6 +171,21 @@ smoking_status=patients.categorised_as(
         include_month=True,
     ),
     
+     # Chronic heart disease codes
+    chd_group=patients.with_these_clinical_events(
+        codelists.chd_cov,
+        returning="binary_flag",
+        on_or_before="elig_date - 1 day",
+    ),
+
+    # Chronic kidney disease diagnostic codes
+    ckd_group=patients.satisfying(
+        """
+            ckd OR
+            (ckd15_date AND 
+            (ckd35_date >= ckd15_date) OR (ckd35_date AND NOT ckd15_date))
+        """,
+    
 #     respiratory disease
     chronic_respiratory_disease=patients.with_these_clinical_events(
         chronic_respiratory_disease_codes,
@@ -285,6 +308,8 @@ smoking_status=patients.categorised_as(
             returning="number_of_matches_in_period",
         ),
     ),
+    
+    
 #     hypertension
     hypertension=patients.with_these_clinical_events(
         hypertension_codes, return_first_date_in_period=True, include_month=True,
@@ -295,10 +320,38 @@ dementia=patients.with_these_clinical_events(
         dementia, return_first_date_in_period=True, include_month=True,
         return_expectations={"date": {"latest": "2020-01-31"}},
     ),
+
+# Chronic Neurological Disease including Significant Learning Disorder
+    cns_group=patients.with_these_clinical_events(
+        codelists.cns_cov,
+        returning="binary_flag",
+        on_or_before="elig_date - 1 day",
 #     Learning Disabilities
-    
+  learning_disability = patients.with_these_clinical_events(
+    learning_disability_codes,
+    on_or_before = "index_date",
+    returning = "binary_flag",
+    return_expectations = {"incidence": 0.2}
+  ),
+   
+#  immunosuppressed
+    immuno_group=patients.satisfying(
+        "immrx OR immdx", 
+        # immunosuppression diagnosis codes
+        immdx=patients.with_these_clinical_events(
+            codelists.immdx_cov,
+            returning="binary_flag",
+            on_or_before="elig_date - 1 day",
+        ),
+        
 #     immuno-suppressant medications
-    
+     immrx=patients.with_these_medications(
+            codelists.immrx,
+            returning="binary_flag",
+            between=["elig_date - 6 months", "elig_date - 1 day"],
+        ),
+    ),
+
 # covid testing https://www.opencodelists.org/codelist/opensafely/covid-identification/2020-06-03/
 # covid cases
 # admission due to covid
@@ -341,4 +394,4 @@ covid_admission_date=patients.admitted_to_hospital(
         },
     ),
 # local authority
-# first dose by 14 may
+
