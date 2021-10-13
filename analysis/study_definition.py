@@ -32,7 +32,7 @@ chronic_respiratory_disease_codes = codelist_from_csv(
     system="ctv3",
     column="CTV3ID",
 )
-hypertension_codes = codelist_from_csv(
+hypertension_dx = codelist_from_csv(
     "codelists/opensafely-hypertension.csv", system="ctv3", column="CTV3ID"
 )
 ## STUDY DEFINITION
