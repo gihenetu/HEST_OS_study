@@ -84,12 +84,35 @@ immrx = codelist_from_csv(
     system="snomed",
     column="code",
 )
-    #vacc codelist
+    #vacc codelists
+    # First COVID vaccination administration codes
+covadm1 = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-covadm1.csv",
+    system="snomed",
+    column="code",
+)
+# Second COVID vaccination administration codes
+covadm2 = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-covadm2.csv",
+    system="snomed",
+    column="code",
+)
     #cases codelist
     #testing codelist
     #admissions
     #deaths
-
+# High Risk from COVID-19 code
+shield = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-shield.csv",
+    system="snomed",
+    column="code",
+)
+# Lower Risk from COVID-19 codes
+nonshield = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-nonshield.csv",
+    system="snomed",
+    column="code",
+)
 
 ## STUDY DEFINITION
 study = StudyDefinition(
@@ -206,36 +229,51 @@ ethnicity=patients.with_these_clinical_events(
 #             "category": {"ratios": {"U071":0.5, "U072":0.5}},
 #         },
 #     ),
-# # vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get which proportion were vaccinated 2 weeks before
-#     # First COVID vaccination administration codes
-#     covadm1_dat=patients.with_vaccination_record(
-#         returning="date",
-#         tpp={
-#             "target_disease_matches": "SARS-2 CORONAVIRUS",
-#         },
-#         emis={
-#             "procedure_codes": codelists.covadm1,
-#         },
-#         find_first_match_in_period=True,
-#         on_or_before="index_date", ### admissions date
-#         on_or_after="2021-05-14",
-#         date_format="YYYY-MM-DD",
-#     ),
-#     # Second COVID vaccination administration codes
-#     covadm2_dat=patients.with_vaccination_record(
-#         returning="date",
-#         tpp={
-#             "target_disease_matches": "SARS-2 CORONAVIRUS",
-#         },
-#         emis={
-#             "procedure_codes": codelists.covadm2,
-#         },
-#         find_last_match_in_period=True,
-#         on_or_before="index_date",
-#         on_or_after="covadm1_dat + 19 days",
-#         date_format="YYYY-MM-DD",
-#     ),
-
+# vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get which proportion were vaccinated 2 weeks before
+    # First COVID vaccination administration codes
+    covadm1_dat=patients.with_vaccination_record(
+        returning="date",
+        tpp={
+            "target_disease_matches": "SARS-2 CORONAVIRUS",
+        },
+        emis={
+            "procedure_codes": covadm1,
+        },
+        find_first_match_in_period=True,
+        # on_or_before="index_date",
+        # on_or_after="2021-05-14",
+        date_format="YYYY-MM-DD",
+    ),
+    # Second COVID vaccination administration codes
+    covadm2_dat=patients.with_vaccination_record(
+        returning="date",
+        tpp={
+            "target_disease_matches": "SARS-2 CORONAVIRUS",
+        },
+        emis={
+            "procedure_codes": covadm2,
+        },
+        find_last_match_in_period=True,
+        on_or_before= index_date,
+        on_or_after="covadm1_dat + 19 days",
+        date_format="YYYY-MM-DD",
+    ),
+    # Those COVID-19 shielding
+    shield_dat=patients.with_these_clinical_events(
+        shield,
+        returning="date",
+        find_last_match_in_period=True,
+        on_or_before=index_date,
+        date_format="YYYY-MM-DD",
+    ),
+    # People that are not shielding
+    nonshield_dat=patients.with_these_clinical_events(
+        nonshield,
+        returning="date",
+        find_last_match_in_period=True,
+        on_or_before=index_date,
+        date_format="YYYY-MM-DD",
+    ),
 ## comorbidities 
 #    BMI
 bmi=patients.most_recent_bmi(
