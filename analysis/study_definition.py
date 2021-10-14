@@ -279,7 +279,6 @@ smoking_status_date=patients.with_these_clinical_events(
         return_expectations={"date": {"latest": "2020-01-31"}},
     ),
 )
-
 # #     preg (compare by months)
 #         preg_36wks_date=patients.with_these_clinical_events(
 #             codelists.preg,
@@ -289,12 +288,12 @@ smoking_status_date=patients.with_these_clinical_events(
 #             date_format="YYYY-MM-DD",
 #         ),
 #     ),   
-#      # Chronic heart disease codes
-# chd_group=patients.with_these_clinical_events(
-#         codelists.chd_cov,
-#         returning="binary_flag",
-#         on_or_before="elig_date - 1 day",
-#     ),
+     # Chronic heart disease codes
+chd_group=patients.with_these_clinical_events(
+        chronic_cardiac_disease,
+        returning="binary_flag",
+        on_or_before="elig_date - 1 day",
+    ),
 
 #     # Chronic kidney disease diagnostic codes
 # ckd_group=patients.satisfying(
@@ -378,28 +377,25 @@ smoking_status_date=patients.with_these_clinical_events(
 #             returning="number_of_matches_in_period",
 #         ),
 #     ),
-    
-    
+#     Dementia
+dementia=patients.with_these_clinical_events(
+        dementia, return_first_date_in_period=True, include_month=True,
+        return_expectations={"date": {"latest": "2020-01-31"}},
+    ),
 
-# #     dementia
-# dementia=patients.with_these_clinical_events(
-#         dementia, return_first_date_in_period=True, include_month=True,
-#         return_expectations={"date": {"latest": "2020-01-31"}},
-#     ),
-
-# # Chronic Neurological Disease including Significant Learning Disorder
-#     cns_group=patients.with_these_clinical_events(
-#         chronic_neuro_disease,
-#         returning="binary_flag",
-#         on_or_before="elig_date - 1 day",
-# #     Learning Disabilities
-#   learning_disability = patients.with_these_clinical_events(
-#     learning_disability_codes,
-#     on_or_before = "index_date",
-#     returning = "binary_flag",
-#     return_expectations = {"incidence": 0.2}
-#   ),
-   
+# Chronic Neurological Disease including Significant Learning Disorder
+cns_group=patients.with_these_clinical_events(
+        chronic_neuro_disease,
+        returning="binary_flag",
+        on_or_before="elig_date - 1 day",
+#     Learning Disabilities
+  learning_disability = patients.with_these_clinical_events(
+    learning_disability_codes,
+    on_or_before = "index_date",
+    returning = "binary_flag",
+    return_expectations = {"incidence": 0.2}
+  ),
+)  
 # #  immunosuppressed
 #     immuno_group=patients.satisfying(
 #         "immrx OR immdx", 
