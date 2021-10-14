@@ -27,13 +27,65 @@ smoking = codelist_from_csv(
 asthma_dx = codelist_from_csv(
     "codelists/opensafely-asthma.csv", system="ctv3", column="CTV3ID"
 )
+chronic_cardiac_disease_codes = codelist_from_csv(
+    "codelists/opensafely-chronic-cardiac-disease.csv", system="ctv3", column="CTV3ID"
+)
+chronic_kidney_disease = codelist_from_csv(
+    "codelists/opensafely-chronic-kidney-disease.csv", system="ctv3", column="CTV3ID"
+)
+chronic_liver_disease_codes = codelist_from_csv(
+    "codelists/opensafely-chronic-liver-disease.csv", system="ctv3", column="CTV3ID"
+)
 chronic_respiratory_disease_codes = codelist_from_csv(
     "codelists/opensafely-chronic-respiratory-disease.csv",
     system="ctv3",
     column="CTV3ID",
 )
+other_cancer_codes = codelist_from_csv(
+    "codelists/opensafely-cancer-excluding-lung-and-haematological.csv",
+    system="ctv3",
+    column="CTV3ID",
+)
+lung_cancer_codes = codelist_from_csv(
+    "codelists/opensafely-lung-cancer.csv", system="ctv3", column="CTV3ID"
+)
+haem_cancer_codes = codelist_from_csv(
+    "codelists/opensafely-haematological-cancer.csv", system="ctv3", column="CTV3ID"
+)
+stroke = codelist_from_csv(
+    "codelists/opensafely-stroke-updated.csv", system="ctv3", column="CTV3ID"
+)
+dementia = codelist_from_csv(
+    "codelists/opensafely-dementia.csv", system="ctv3", column="CTV3ID"
+)
+chronic_neuro_disease = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-cns_cov.csv",
+    system="snomed",
+    column="code",
+)
+learning_disability_codes = codelist_from_csv(
+    "codelists/opensafely-learning-disabilities.csv", system="ctv3", column="CTV3ID"
+)
 hypertension_dx = codelist_from_csv(
     "codelists/opensafely-hypertension.csv", system="ctv3", column="CTV3ID"
+)
+diabetes_codes = codelist_from_csv(
+    "codelists/opensafely-diabetes.csv", system="ctv3", column="CTV3ID"
+)
+preg = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-preg.csv",
+    system="snomed",
+    column="code",
+)
+immdx_cov = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-immdx_cov.csv",
+    system="snomed",
+    column="code",
+)
+immrx = codelist_from_csv(
+    "codelists/primis-covid19-vacc-uptake-immrx.csv",
+    system="snomed",
+    column="code",
 )
 ## STUDY DEFINITION
 study = StudyDefinition(
@@ -337,7 +389,7 @@ smoking_status_date=patients.with_these_clinical_events(
 
 # # Chronic Neurological Disease including Significant Learning Disorder
 #     cns_group=patients.with_these_clinical_events(
-#         codelists.cns_cov,
+#         chronic_neuro_disease,
 #         returning="binary_flag",
 #         on_or_before="elig_date - 1 day",
 # #     Learning Disabilities
