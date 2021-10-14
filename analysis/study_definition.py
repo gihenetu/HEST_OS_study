@@ -53,7 +53,7 @@ haem_cancer_codes = codelist_from_csv(
     "codelists/opensafely-haematological-cancer.csv", system="ctv3", column="CTV3ID"
 )
 stroke = codelist_from_csv(
-    "codelists/opensafely-stroke-updated.csv", system="ctv3", column="CTV3ID"
+    "codelists/opensafely-stroke.csv", system="ctv3", column="CTV3ID"
 )
 dementia = codelist_from_csv(
     "codelists/opensafely-dementia.csv", system="ctv3", column="CTV3ID"
@@ -64,7 +64,7 @@ chronic_neuro_disease = codelist_from_csv(
     column="code",
 )
 learning_disability_codes = codelist_from_csv(
-    "codelists/opensafely-learning-disabilities.csv", system="ctv3", column="CTV3ID"
+    "codelists/opensafely-learning-disabilities.csv", system="ctv3", column="CTV3Code"
 )
 hypertension_dx = codelist_from_csv(
     "codelists/opensafely-hypertension.csv", system="ctv3", column="CTV3ID"
@@ -288,13 +288,12 @@ smoking_status_date=patients.with_these_clinical_events(
 #             date_format="YYYY-MM-DD",
 #         ),
 #     ),   
-     # Chronic heart disease codes
-chd_group=patients.with_these_clinical_events(
-        chronic_cardiac_disease,
-        returning="binary_flag",
-        on_or_before="elig_date - 1 day",
-    ),
-
+#      # Chronic heart disease codes
+# chd_group=patients.with_these_clinical_events(
+#         chronic_cardiac_disease,
+#         returning="binary_flag",
+#         on_or_before="elig_date - 1 day",
+#     ),
 #     # Chronic kidney disease diagnostic codes
 # ckd_group=patients.satisfying(
 #         """
@@ -378,24 +377,23 @@ chd_group=patients.with_these_clinical_events(
 #         ),
 #     ),
 #     Dementia
-dementia=patients.with_these_clinical_events(
-        dementia, return_first_date_in_period=True, include_month=True,
-        return_expectations={"date": {"latest": "2020-01-31"}},
-    ),
+# dementia=patients.with_these_clinical_events(
+#         dementia, return_first_date_in_period=True, include_month=True,
+#         return_expectations={"date": {"latest": "2020-01-31"}},
+#     ),
 
-# Chronic Neurological Disease including Significant Learning Disorder
-cns_group=patients.with_these_clinical_events(
-        chronic_neuro_disease,
-        returning="binary_flag",
-        on_or_before="elig_date - 1 day",
-#     Learning Disabilities
-  learning_disability = patients.with_these_clinical_events(
-    learning_disability_codes,
-    on_or_before = "index_date",
-    returning = "binary_flag",
-    return_expectations = {"incidence": 0.2}
-  ),
-)  
+# # Chronic Neurological Disease including Significant Learning Disorder
+# cns_group=patients.with_these_clinical_events(
+#         chronic_neuro_disease,
+#         returning="binary_flag",
+#         on_or_before="elig_date - 1 day",
+# #     Learning Disabilities
+#   learning_disability = patients.with_these_clinical_events(
+#     learning_disability_codes,
+#     on_or_before = "index_date",
+#     returning = "binary_flag",
+#     return_expectations = {"incidence": 0.2}
+#   ),
 # #  immunosuppressed
 #     immuno_group=patients.satisfying(
 #         "immrx OR immdx", 
