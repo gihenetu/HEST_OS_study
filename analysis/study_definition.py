@@ -84,6 +84,7 @@ immrx = codelist_from_csv(
     system="snomed",
     column="code",
 )
+# # COVID codelists
     #vacc codelists
     # First COVID vaccination administration codes
 covadm1 = codelist_from_csv(
@@ -98,9 +99,17 @@ covadm2 = codelist_from_csv(
     column="code",
 )
     #cases codelist
+covid_codelist = codelist_from_csv(
+    "codelists/opensafely-covid-identification.csv",
+    system="icd10",
+    column="icd10_code",
+)
     #testing codelist
     #admissions
     #deaths
+covid_codelist = codelist(["U071", "U072"], system="icd10")
+covidconf_codelist = codelist(["U071"], system="icd10")
+
 # High Risk from COVID-19 code
 shield = codelist_from_csv(
     "codelists/primis-covid19-vacc-uptake-shield.csv",
@@ -209,7 +218,60 @@ ethnicity=patients.with_these_clinical_events(
         },
     ),
 ## COVID-19 variables
+# # covid testing
+    sgss_covid19_date=patients.with_test_result_in_sgss(
+        pathogen="SARS-CoV-2",
+        returning="date",
+        find_first_match_in_period=True,
+        date_format="YYYY-MM-DD",
+        on_or_after=index_date,
+        return_expectations={
+            "date": {"earliest": index_date, "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.05,
+        },
+    ),
 # # covid cases
+    sgss_covid19_pos_test=patients.with_test_result_in_sgss(
+        pathogen="SARS-CoV-2",
+        test_result="positive",
+        returning="date",
+        find_first_match_in_period=True,
+        date_format="YYYY-MM-DD",
+        on_or_after=index_date,
+        return_expectations={
+            "date": {"earliest": index_date, "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.05,
+        },
+    ),
+# # covid deaths
+   died_date_cpns=patients.with_death_recorded_in_cpns(
+        returning="date_of_death",
+        include_month=True,
+        include_day=True,
+    ),
+    died_ons_covid_flag_any=patients.with_these_codes_on_death_certificate(
+        covid_codelist,
+        match_only_underlying_cause=False,
+        return_expectations={"date": {"earliest": "2020-03-01"}},
+    ),
+    died_ons_covid_flag_underlying=patients.with_these_codes_on_death_certificate(
+        covid_codelist,
+        match_only_underlying_cause=True,
+        return_expectations={"date": {"earliest": "2020-03-01"}},
+    ),
+    died_ons_covidconf_flag_underlying=patients.with_these_codes_on_death_certificate(
+        covidconf_codelist,
+        match_only_underlying_cause=True,
+        return_expectations={"date": {"earliest": "2020-03-01"}},
+    ),
+    died_date_ons=patients.died_from_any_cause(
+        returning="date_of_death",
+        include_month=True,
+        include_day=True,
+        return_expectations={"date": {"earliest": "2020-03-01"}},
+    ),
 # # admission due to covid
 # covid_admission_date=patients.admitted_to_hospital(
 #         returning= "date_admitted" ,  # defaults to "binary_flag"
@@ -229,6 +291,22 @@ ethnicity=patients.with_these_clinical_events(
 #             "category": {"ratios": {"U071":0.5, "U072":0.5}},
 #         },
 #     ),
+  patient_index_date=patients.admitted_to_hospital(
+        returning="date_discharged",
+        with_these_diagnoses=covid_codelist,
+        on_or_after=index_date,
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={"date": {"earliest": index_date}},
+    ),
+    exposure_hospitalisation=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=covid_codelist,
+        on_or_after=index_date,
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={"date": {"earliest": index_date}},
+    ),
 # vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get which proportion were vaccinated 2 weeks before
     # First COVID vaccination administration codes
     covadm1_dat=patients.with_vaccination_record(
@@ -274,7 +352,7 @@ ethnicity=patients.with_these_clinical_events(
         on_or_before=index_date,
         date_format="YYYY-MM-DD",
     ),
-## comorbidities 
+## COMORBIDITIES 
 #    BMI
 bmi=patients.most_recent_bmi(
         between=["2010-02-01", "2020-01-31"],
