@@ -98,18 +98,16 @@ covadm2 = codelist_from_csv(
     system="snomed",
     column="code",
 )
-    #cases codelist
+    #testing and cases codelist
 covid_codelist = codelist_from_csv(
     "codelists/opensafely-covid-identification.csv",
     system="icd10",
     column="icd10_code",
 )
-    #testing codelist
-    #admissions
+    #admissions <- not sure if there is a codelist to connect to here?
     #deaths
 covid_codelist = codelist(["U071", "U072"], system="icd10")
 covidconf_codelist = codelist(["U071"], system="icd10")
-
 # High Risk from COVID-19 code
 shield = codelist_from_csv(
     "codelists/primis-covid19-vacc-uptake-shield.csv",
