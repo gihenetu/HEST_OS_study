@@ -444,7 +444,7 @@ cnd=patients.with_these_clinical_events(
             immrx,
             returning="binary_flag",
             on_or_before= index_date,
-        ),
+    ),
     ),
  )
   
