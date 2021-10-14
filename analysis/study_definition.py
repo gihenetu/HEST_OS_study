@@ -15,9 +15,6 @@ ethnicity_codes_16 = codelist_from_csv(
     column="Code",
     category_column="Grouping_16",
 )
-    #vacc codelist
-    #cases codelist
-    #testing codelist
 smoking = codelist_from_csv(
     "codelists/opensafely-smoking.csv",
     system="ctv3",
@@ -30,7 +27,7 @@ asthma_dx = codelist_from_csv(
 chronic_cardiac_disease_codes = codelist_from_csv(
     "codelists/opensafely-chronic-cardiac-disease.csv", system="ctv3", column="CTV3ID"
 )
-chronic_kidney_disease = codelist_from_csv(
+chronic_kidney_disease_codes = codelist_from_csv(
     "codelists/opensafely-chronic-kidney-disease.csv", system="ctv3", column="CTV3ID"
 )
 chronic_liver_disease_codes = codelist_from_csv(
@@ -87,6 +84,13 @@ immrx = codelist_from_csv(
     system="snomed",
     column="code",
 )
+    #vacc codelist
+    #cases codelist
+    #testing codelist
+    #admissions
+    #deaths
+
+
 ## STUDY DEFINITION
 study = StudyDefinition(
     default_expectations={
@@ -97,7 +101,6 @@ study = StudyDefinition(
     population=patients.registered_with_one_practice_between(
         "2021-05-14", "2021-10-01"
     ),
-
     age=patients.age_as_of(
         "2021-05-14",
         return_expectations={
@@ -182,7 +185,27 @@ ethnicity=patients.with_these_clinical_events(
             "incidence": 0.75,
         },
     ),
-
+## COVID-19 variables
+# # covid cases
+# # admission due to covid
+# covid_admission_date=patients.admitted_to_hospital(
+#         returning= "date_admitted" ,  # defaults to "binary_flag"
+#         with_these_diagnoses=covid_codelist,  # optional
+#         on_or_after="2021-05-14",
+#         find_first_match_in_period=True,  
+#         date_format="YYYY-MM-DD",  
+#         return_expectations={"date": {"earliest": "2021-05-14"}, "incidence" : 0.25},
+#    ),
+#     covid_admission_primary_diagnosis=patients.admitted_to_hospital(
+#         returning="primary_diagnosis",
+#         with_these_diagnoses=covid_codelist,  # optional
+#         on_or_after="2020-05-14",
+#         find_first_match_in_period=True,  
+#         date_format="YYYY-MM-DD", 
+#         return_expectations={"date": {"earliest": "2021-05-14"},"incidence" : 0.25,
+#             "category": {"ratios": {"U071":0.5, "U072":0.5}},
+#         },
+#     ),
 # # vaccination <- yes vaccination is vaccinated 2 weeks before admission, to get which proportion were vaccinated 2 weeks before
 #     # First COVID vaccination administration codes
 #     covadm1_dat=patients.with_vaccination_record(
@@ -212,8 +235,9 @@ ethnicity=patients.with_these_clinical_events(
 #         on_or_after="covadm1_dat + 19 days",
 #         date_format="YYYY-MM-DD",
 #     ),
-# ## comorbidities 
-#     BMI
+
+## comorbidities 
+#    BMI
 bmi=patients.most_recent_bmi(
         between=["2010-02-01", "2020-01-31"],
         minimum_age_at_measurement=16,
@@ -232,68 +256,87 @@ smoking_status_date=patients.with_these_clinical_events(
         return_last_date_in_period=True,
         include_month=True,
     ),
-#     asthma
-#  asthma=patients.categorised_as(
-#         {
-#             "0": "DEFAULT",
-#             "1": """
-#                 (
-#                   recent_asthma_code OR (
-#                     asthma_code_ever AND NOT
-#                     copd_code_ever
-#                   )
-#                 ) AND (
-#                   prednisolone_last_year = 0 OR 
-#                   prednisolone_last_year > 4
-#                 )
-#             """,
-#             "2": """
-#                 (
-#                   recent_asthma_code OR (
-#                     asthma_code_ever AND NOT
-#                     copd_code_ever
-#                   )
-#                 ) AND
-#                 prednisolone_last_year > 0 AND
-#                 prednisolone_last_year < 5
-                
-#             """,
-#         },
-#         return_expectations={"category": {"ratios": {"0": 0.8, "1": 0.1, "2": 0.1}},},
-#         recent_asthma_code=patients.with_these_clinical_events(
-#             asthma_dx, between=["2017-02-01", "2020-01-31"],
-#         ),
-#         asthma_code_ever=patients.with_these_clinical_events(asthma_dx),
-#         copd_code_ever=patients.with_these_clinical_events(
-#             chronic_respiratory_disease_codes
-#         ),
-# #Chronic resp disease
-# chronic_respiratory_disease=patients.with_these_clinical_events(
-#         chronic_respiratory_disease_codes,
-#         return_first_date_in_period=True,
-#         include_month=True,
-#     ),
+## Asthma
+asthma=patients.with_these_clinical_events(
+        asthma_dx,
+        returning = "binary_flag",
+        return_first_date_in_period=True,
+        include_month=True,
+    ),
+# #Chronic respiratory disease
+chronic_respiratory_disease=patients.with_these_clinical_events(
+        chronic_respiratory_disease_codes,
+        returning = "binary_flag",
+        return_first_date_in_period=True,
+        include_month=True,
+    ),
 #     hypertension
     hypertension=patients.with_these_clinical_events(
-        hypertension_dx, return_first_date_in_period=True, include_month=True,
+        hypertension_dx, 
+        return_first_date_in_period=True, 
+        include_month=True,
         return_expectations={"date": {"latest": "2020-01-31"}},
     ),
-)
-# #     preg (compare by months)
-#         preg_36wks_date=patients.with_these_clinical_events(
-#             codelists.preg,
-#             returning="date",
-#             find_last_match_in_period=True,
-#             between=["index_date - 252 days", "index_date - 1 day"],
-#             date_format="YYYY-MM-DD",
-#         ),
-#     ),   
-#      # Chronic heart disease codes
-# chd_group=patients.with_these_clinical_events(
-#         chronic_cardiac_disease,
-#         returning="binary_flag",
-#         on_or_before="elig_date - 1 day",
-#     ),
+#     preg (compare by months)
+        preg_36wks_date=patients.with_these_clinical_events(
+            preg,
+            returning="date",
+            find_last_match_in_period=True,
+            # between=["index_date - 252 days", "index_date - 1 day"],
+            date_format="YYYY-MM-DD",
+        ),
+        # Chronic heart disease codes
+chronic_cardiac_disease=patients.with_these_clinical_events(
+        chronic_cardiac_disease_codes,
+        returning= "binary_flag",
+        on_or_before= index_date,
+    ),
+diabetes=patients.with_these_clinical_events(
+        diabetes_codes,
+        returning= "binary_flag",
+        on_or_before = index_date,
+    ),
+    # Dementia
+dementia=patients.with_these_clinical_events(
+        dementia, 
+        return_first_date_in_period=True, 
+        include_month=True,
+        return_expectations={"date": {"latest": "2020-01-31"}},
+    ),
+# Chronic Neurological Disease including Significant Learning Disorder
+cnd=patients.with_these_clinical_events(
+        chronic_neuro_disease,
+        returning="binary_flag",
+        on_or_before=index_date,
+        ),
+#     Learning Disabilities
+  learning_disability = patients.with_these_clinical_events(
+    learning_disability_codes,
+    on_or_before = index_date,
+    returning = "binary_flag",
+    return_expectations = {"incidence": 0.2}
+  ),
+#  immunosuppressed
+    immuno_group=patients.satisfying(
+        "immrx OR immdx", 
+        # immunosuppression diagnosis codes
+        immdx=patients.with_these_clinical_events(
+            immdx_cov,
+            returning="binary_flag",
+            on_or_before= index_date,
+        ),
+#     immuno-suppressant medications
+     immrx=patients.with_these_medications(
+            immrx,
+            returning="binary_flag",
+            on_or_before= index_date,
+        ),
+    ),
+ )
+  
+
+    
+#################### Do we need these? ####################################
 #     # Chronic kidney disease diagnostic codes
 # ckd_group=patients.satisfying(
 #         """
@@ -301,70 +344,6 @@ smoking_status_date=patients.with_these_clinical_events(
 #             (ckd15_date AND 
 #             (ckd35_date >= ckd15_date) OR (ckd35_date AND NOT ckd15_date))
 #         """,
-    
-# #     diabetes
-#     type1_diabetes=patients.with_these_clinical_events(
-#         diabetes_t1_codes,
-#         on_or_before="2020-01-31",
-#         return_first_date_in_period=True,
-#         include_month=True,
-#     ),
-#     type2_diabetes=patients.with_these_clinical_events(
-#         diabetes_t2_codes,
-#         on_or_before="2020-01-31",
-#         return_first_date_in_period=True,
-#         include_month=True,
-#     ),
-#     unknown_diabetes=patients.with_these_clinical_events(
-#         diabetes_unknown_codes,
-#         on_or_before="2020-01-31",
-#         return_first_date_in_period=True,
-#         include_month=True,
-#     ),
-
- 
-#      diabetes_type=patients.categorised_as(
-#         {
-#             "T1DM":
-#                 """
-#                         (type1_diabetes AND NOT
-#                         type2_diabetes) 
-#                     OR
-#                         (((type1_diabetes AND type2_diabetes) OR 
-#                         (type1_diabetes AND unknown_diabetes AND NOT type2_diabetes) OR
-#                         (unknown_diabetes AND NOT type1_diabetes AND NOT type2_diabetes))
-#                         AND 
-#                         (insulin_lastyear_meds > 0 AND NOT
-#                         oad_lastyear_meds > 0))
-#                 """,
-#             "T2DM":
-#                 """
-#                         (type2_diabetes AND NOT
-#                         type1_diabetes)
-#                     OR
-#                         (((type1_diabetes AND type2_diabetes) OR 
-#                         (type2_diabetes AND unknown_diabetes AND NOT type1_diabetes) OR
-#                         (unknown_diabetes AND NOT type1_diabetes AND NOT type2_diabetes))
-#                         AND 
-#                         (oad_lastyear_meds > 0))
-#                 """,
-#             "UNKNOWN_DM":
-#                 """
-#                         ((unknown_diabetes AND NOT type1_diabetes AND NOT type2_diabetes) AND NOT
-#                         oad_lastyear_meds AND NOT
-#                         insulin_lastyear_meds) 
-                   
-#                 """,
-#             "NO_DM": "DEFAULT",
-#         },
-
-#         return_expectations={
-#             "category": {"ratios": {"T1DM": 0.03, "T2DM": 0.2, "UNKNOWN_DM": 0.02, "NO_DM": 0.75}},
-#             "rate" : "universal"
-
-#         },
-
- 
 #         oad_lastyear_meds=patients.with_these_medications(
 #             oad_med_codes, 
 #             between=["2019-02-01", "2020-01-31"],
@@ -376,59 +355,3 @@ smoking_status_date=patients.with_these_clinical_events(
 #             returning="number_of_matches_in_period",
 #         ),
 #     ),
-#     Dementia
-# dementia=patients.with_these_clinical_events(
-#         dementia, return_first_date_in_period=True, include_month=True,
-#         return_expectations={"date": {"latest": "2020-01-31"}},
-#     ),
-
-# # Chronic Neurological Disease including Significant Learning Disorder
-# cns_group=patients.with_these_clinical_events(
-#         chronic_neuro_disease,
-#         returning="binary_flag",
-#         on_or_before="elig_date - 1 day",
-# #     Learning Disabilities
-#   learning_disability = patients.with_these_clinical_events(
-#     learning_disability_codes,
-#     on_or_before = "index_date",
-#     returning = "binary_flag",
-#     return_expectations = {"incidence": 0.2}
-#   ),
-# #  immunosuppressed
-#     immuno_group=patients.satisfying(
-#         "immrx OR immdx", 
-#         # immunosuppression diagnosis codes
-#         immdx=patients.with_these_clinical_events(
-#             codelists.immdx_cov,
-#             returning="binary_flag",
-#             on_or_before="elig_date - 1 day",
-#         ),
-# #     immuno-suppressant medications
-#      immrx=patients.with_these_medications(
-#             codelists.immrx,
-#             returning="binary_flag",
-#             between=["elig_date - 6 months", "elig_date - 1 day"],
-#         ),
-#     ),
-
-# # covid cases
-# # admission due to covid
-# covid_admission_date=patients.admitted_to_hospital(
-#         returning= "date_admitted" ,  # defaults to "binary_flag"
-#         with_these_diagnoses=covid_codelist,  # optional
-#         on_or_after="2021-05-14",
-#         find_first_match_in_period=True,  
-#         date_format="YYYY-MM-DD",  
-#         return_expectations={"date": {"earliest": "2021-05-14"}, "incidence" : 0.25},
-#    ),
-#     covid_admission_primary_diagnosis=patients.admitted_to_hospital(
-#         returning="primary_diagnosis",
-#         with_these_diagnoses=covid_codelist,  # optional
-#         on_or_after="2020-05-14",
-#         find_first_match_in_period=True,  
-#         date_format="YYYY-MM-DD", 
-#         return_expectations={"date": {"earliest": "2021-05-14"},"incidence" : 0.25,
-#             "category": {"ratios": {"U071":0.5, "U072":0.5}},
-#         },
-#     ),
-# )
