@@ -495,24 +495,3 @@ cnd=patients.with_these_clinical_events(
     ),
  )
   
-
-    
-#################### Do we need these? ####################################
-#     # Chronic kidney disease diagnostic codes
-# ckd_group=patients.satisfying(
-#         """
-#             ckd OR
-#             (ckd15_date AND 
-#             (ckd35_date >= ckd15_date) OR (ckd35_date AND NOT ckd15_date))
-#         """,
-#         oad_lastyear_meds=patients.with_these_medications(
-#             oad_med_codes, 
-#             between=["2019-02-01", "2020-01-31"],
-#             returning="number_of_matches_in_period",
-#         ),
-#         insulin_lastyear_meds=patients.with_these_medications(
-#             insulin_med_codes,
-#             between=["2019-02-01", "2020-01-31"],
-#             returning="number_of_matches_in_period",
-#         ),
-#     ),
