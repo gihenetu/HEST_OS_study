@@ -145,15 +145,6 @@ sex=patients.sex(
         }
     ),
     #deprivation
-# imd=patients.address_as_of(
-#         index_date,
-#         returning="index_of_multiple_deprivation",
-#         round_to_nearest=100,
-#         return_expectations={
-#             "rate": "universal",
-#             "category": {"ratios": {"100": 0.1, "200": 0.2, "300": 0.7}},
-#         },
-#     ),
         imd=patients.categorised_as(
             {
                 "0": "DEFAULT",
@@ -312,25 +303,25 @@ ethnicity=patients.with_these_clinical_events(
         include_day=True,
         return_expectations={"date": {"earliest": "2020-03-01"}},
     ),
-# # admission due to covid
-# covid_admission_date=patients.admitted_to_hospital(
-#         returning= "date_admitted" ,  # defaults to "binary_flag"
-#         with_these_diagnoses=covid_codelist,  # optional
-#         on_or_after="2021-05-14",
-#         find_first_match_in_period=True,  
-#         date_format="YYYY-MM-DD",  
-#         return_expectations={"date": {"earliest": "2021-05-14"}, "incidence" : 0.25},
-#    ),
-#     covid_admission_primary_diagnosis=patients.admitted_to_hospital(
-#         returning="primary_diagnosis",
-#         with_these_diagnoses=covid_codelist,  # optional
-#         on_or_after="2020-05-14",
-#         find_first_match_in_period=True,  
-#         date_format="YYYY-MM-DD", 
-#         return_expectations={"date": {"earliest": "2021-05-14"},"incidence" : 0.25,
-#             "category": {"ratios": {"U071":0.5, "U072":0.5}},
-#         },
-#     ),
+# admission due to covid
+covid_admission_date=patients.admitted_to_hospital(
+        returning= "binary_flag", 
+        with_these_diagnoses=covid_codelist,
+        on_or_after="2021-05-14",
+        find_first_match_in_period=True,  
+        date_format="YYYY-MM-DD",  
+        return_expectations={"date": {"earliest": "2021-05-14"}, "incidence" : 0.25},
+   ),
+    covid_admission_primary_diagnosis=patients.admitted_to_hospital(
+        returning="primary_diagnosis",
+        with_these_diagnoses=covid_codelist,
+        on_or_after="2020-05-14",
+        find_first_match_in_period=True,  
+        date_format="YYYY-MM-DD", 
+        return_expectations={"date": {"earliest": "2021-05-14"},"incidence" : 0.25,
+            "category": {"ratios": {"U071":0.5, "U072":0.5}},
+        },
+    ),
   patient_index_date=patients.admitted_to_hospital(
         returning="date_discharged",
         with_these_diagnoses=covid_codelist,
@@ -362,9 +353,22 @@ ethnicity=patients.with_these_clinical_events(
         # on_or_after="2021-05-14",
         date_format="YYYY-MM-DD",
     ),
+    cov_vacc_d1=patients.with_vaccination_record(
+        returning="binary_flag",
+        tpp={
+            "target_disease_matches": "SARS-2 CORONAVIRUS",
+        },
+        emis={
+            "procedure_codes": covadm1,
+        },
+        find_first_match_in_period=True,
+        # on_or_before="index_date",
+        # on_or_after="2021-05-14",
+        date_format="YYYY-MM-DD",
+    ),
     # Second COVID vaccination administration codes
-    covadm2_dat=patients.with_vaccination_record(
-        returning="date",
+    cov_vacc_d2=patients.with_vaccination_record(
+        returning="binary_flag",
         tpp={
             "target_disease_matches": "SARS-2 CORONAVIRUS",
         },
@@ -397,8 +401,8 @@ ethnicity=patients.with_these_clinical_events(
 bmi=patients.most_recent_bmi(
         between=["2010-02-01", "2020-01-31"],
         minimum_age_at_measurement=16,
-        include_measurement_date=True,
-        include_month=True,
+        include_measurement_date=False,
+        # include_month=True,
         return_expectations={
             "date": {"earliest": "2010-02-01", "latest": "2020-01-31"},
             "float": {"distribution": "normal", "mean": 35, "stddev": 10},
@@ -406,37 +410,38 @@ bmi=patients.most_recent_bmi(
         },
     ),
 #     smoking
-smoking_status_date=patients.with_these_clinical_events(
+smoking_status=patients.with_these_clinical_events(
         smoking,
-        on_or_before="2020-01-31",
-        return_last_date_in_period=True,
-        include_month=True,
+        returning = "binary_flag",
+        on_or_before= index_date,
+        return_last_date_in_period=False,
+        # include_month=True,
     ),
 ## Asthma
 asthma=patients.with_these_clinical_events(
         asthma_dx,
         returning = "binary_flag",
-        return_first_date_in_period=True,
-        include_month=True,
+        on_or_before = index_date,
+        return_first_date_in_period=False,
     ),
 # #Chronic respiratory disease
 chronic_respiratory_disease=patients.with_these_clinical_events(
         chronic_respiratory_disease_codes,
         returning = "binary_flag",
-        return_first_date_in_period=True,
-        include_month=True,
+        on_or_before = index_date,
+        return_first_date_in_period=False,
     ),
 #     hypertension
     hypertension=patients.with_these_clinical_events(
         hypertension_dx, 
-        return_first_date_in_period=True, 
-        include_month=True,
-        return_expectations={"date": {"latest": "2020-01-31"}},
+        returning = "binary_flag",
+        return_first_date_in_period=False, 
+        return_expectations={"date": {"earliest": index_date}},
     ),
 #     preg (compare by months)
         preg_36wks_date=patients.with_these_clinical_events(
             preg,
-            returning="date",
+            returning="binary_flag",
             find_last_match_in_period=True,
             # between=["index_date - 252 days", "index_date - 1 day"],
             date_format="YYYY-MM-DD",
