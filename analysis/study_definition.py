@@ -16,13 +16,13 @@ ethnicity_codes_16 = codelist_from_csv(
     category_column="Grouping_16",
 )
 smoking = codelist_from_csv(
-    "codelists/opensafely-smoking.csv",
+    "codelists/opensafely-smoking-clear.csv",
     system="ctv3",
     column="CTV3Code",
     category_column="Category",
 )
 asthma_dx = codelist_from_csv(
-    "codelists/opensafely-asthma.csv", system="ctv3", column="CTV3ID"
+    "codelists/opensafely-asthma-diagnosis.csv", system="ctv3", column="CTV3ID"
 )
 chronic_cardiac_disease_codes = codelist_from_csv(
     "codelists/opensafely-chronic-cardiac-disease.csv", system="ctv3", column="CTV3ID"
@@ -50,7 +50,7 @@ haem_cancer_codes = codelist_from_csv(
     "codelists/opensafely-haematological-cancer.csv", system="ctv3", column="CTV3ID"
 )
 stroke = codelist_from_csv(
-    "codelists/opensafely-stroke.csv", system="ctv3", column="CTV3ID"
+    "codelists/opensafely-stroke-updated.csv", system="ctv3", column="CTV3ID"
 )
 dementia = codelist_from_csv(
     "codelists/opensafely-dementia.csv", system="ctv3", column="CTV3ID"
