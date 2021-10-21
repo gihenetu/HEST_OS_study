@@ -420,11 +420,11 @@ dementia=patients.with_these_clinical_events(
     ),
 # Chronic Neurological Disease including Significant Learning Disorder
 cnd=patients.with_these_clinical_events(
-        chronic_neuro_disease,
-        returning="binary_flag",
-        on_or_before=index_date,
-        ),
-#     Learning Disabilities
+    chronic_neuro_disease,
+    returning="binary_flag",
+    on_or_before=index_date,
+    ),
+#   Learning Disabilities
   learning_disability = patients.with_these_clinical_events(
     learning_disability_codes,
     on_or_before = index_date,
@@ -435,16 +435,16 @@ cnd=patients.with_these_clinical_events(
     immuno_group=patients.satisfying(
         "immrx OR immdx", 
         # immunosuppression diagnosis codes
-        immdx=patients.with_these_clinical_events(
-            immdx_cov,
-            returning="binary_flag",
-            on_or_before= index_date,
+    immdx=patients.with_these_clinical_events(
+        immdx_cov,
+        returning="binary_flag",
+        on_or_before= index_date,
         ),
 #     immuno-suppressant medications
      immrx=patients.with_these_medications(
-            immrx,
-            returning="binary_flag",
-            on_or_before= index_date,
-    ),
+        immrx,
+        returning="binary_flag",
+        on_or_before= index_date,
+        ),
     ),
  )
