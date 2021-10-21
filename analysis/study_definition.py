@@ -198,7 +198,7 @@ ethnicity = patients.categorised_as(
         date_format="YYYY-MM-DD",
         on_or_after=index_date,
         return_expectations={
-            "date": {"earliest": index_date, "latest" : "today"},
+            "date": {"earliest": index_date, "latest" : end_study_period},
             "rate": "uniform",
             "incidence": 0.05,
         },
@@ -212,7 +212,7 @@ ethnicity = patients.categorised_as(
         date_format="YYYY-MM-DD",
         on_or_after=index_date,
         return_expectations={
-            "date": {"earliest": index_date, "latest" : "today"},
+            "date": {"earliest": index_date, "latest" : end_study_period},
             "rate": "uniform",
             "incidence": 0.05,
         },
@@ -248,18 +248,18 @@ ethnicity = patients.categorised_as(
 covid_admission_date=patients.admitted_to_hospital(
         returning= "binary_flag", 
         with_these_diagnoses=covid_codelist,
-        on_or_after="2021-05-14",
+        on_or_after= index_date,
         find_first_match_in_period=True,  
         date_format="YYYY-MM-DD",  
-        return_expectations={"date": {"earliest": "2021-05-14"}, "incidence" : 0.25},
+        return_expectations={"date": {"earliest": index_date}, "incidence" : 0.25},
    ),
     covid_admission_primary_diagnosis=patients.admitted_to_hospital(
         returning="primary_diagnosis",
         with_these_diagnoses=covid_codelist,
-        on_or_after="2020-05-14",
+        on_or_after= index_date,
         find_first_match_in_period=True,  
         date_format="YYYY-MM-DD", 
-        return_expectations={"date": {"earliest": "2021-05-14"},"incidence" : 0.25,
+        return_expectations={"date": {"earliest": index_date},"incidence" : 0.25,
             "category": {"ratios": {"U071":0.5, "U072":0.5}},
         },
     ),
@@ -290,8 +290,6 @@ covid_admission_date=patients.admitted_to_hospital(
             "procedure_codes": covadm1,
         },
         find_first_match_in_period=True,
-        # on_or_before="index_date",
-        # on_or_after="2021-05-14",
         date_format="YYYY-MM-DD",
     ),
     cov_vacc_d1=patients.with_vaccination_record(
@@ -303,8 +301,6 @@ covid_admission_date=patients.admitted_to_hospital(
             "procedure_codes": covadm1,
         },
         find_first_match_in_period=True,
-        # on_or_before="index_date",
-        # on_or_after="2021-05-14",
         date_format="YYYY-MM-DD",
     ),
     # Second COVID vaccination administration codes
@@ -358,12 +354,12 @@ covid_admission_date=patients.admitted_to_hospital(
 ## COMORBIDITIES 
 #    BMI
 bmi=patients.most_recent_bmi(
-        between=["2010-02-01", "2020-01-31"],
+        between=["2010-02-01", end_study_period],
         minimum_age_at_measurement=16,
         include_measurement_date=False,
         # include_month=True,
         return_expectations={
-            "date": {"earliest": "2010-02-01", "latest": "2020-01-31"},
+            "date": {"earliest": "2010-02-01", "latest": end_study_period},
             "float": {"distribution": "normal", "mean": 35, "stddev": 10},
             "incidence": 0.95,
         },
