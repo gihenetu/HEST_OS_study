@@ -1,124 +1,9 @@
 from cohortextractor import StudyDefinition, patients, codelist, codelist_from_csv  # NOQA
 
-index_date = "2021-05-14"
+from codelists import *
 
-## Codelists
-ethnicity_codes = codelist_from_csv(
-    "codelists/opensafely-ethnicity.csv",
-    system="ctv3",
-    column="Code",
-    category_column="Grouping_6",
-)
-ethnicity_codes_16 = codelist_from_csv(
-    "codelists/opensafely-ethnicity.csv",
-    system="ctv3",
-    column="Code",
-    category_column="Grouping_16",
-)
-smoking = codelist_from_csv(
-    "codelists/opensafely-smoking-clear.csv",
-    system="ctv3",
-    column="CTV3Code",
-    category_column="Category",
-)
-asthma_dx = codelist_from_csv(
-    "codelists/opensafely-asthma-diagnosis.csv", system="ctv3", column="CTV3ID"
-)
-chronic_cardiac_disease_codes = codelist_from_csv(
-    "codelists/opensafely-chronic-cardiac-disease.csv", system="ctv3", column="CTV3ID"
-)
-chronic_kidney_disease_codes = codelist_from_csv(
-    "codelists/opensafely-chronic-kidney-disease.csv", system="ctv3", column="CTV3ID"
-)
-chronic_liver_disease_codes = codelist_from_csv(
-    "codelists/opensafely-chronic-liver-disease.csv", system="ctv3", column="CTV3ID"
-)
-chronic_respiratory_disease_codes = codelist_from_csv(
-    "codelists/opensafely-chronic-respiratory-disease.csv",
-    system="ctv3",
-    column="CTV3ID",
-)
-other_cancer_codes = codelist_from_csv(
-    "codelists/opensafely-cancer-excluding-lung-and-haematological.csv",
-    system="ctv3",
-    column="CTV3ID",
-)
-lung_cancer_codes = codelist_from_csv(
-    "codelists/opensafely-lung-cancer.csv", system="ctv3", column="CTV3ID"
-)
-haem_cancer_codes = codelist_from_csv(
-    "codelists/opensafely-haematological-cancer.csv", system="ctv3", column="CTV3ID"
-)
-stroke = codelist_from_csv(
-    "codelists/opensafely-stroke-updated.csv", system="ctv3", column="CTV3ID"
-)
-dementia = codelist_from_csv(
-    "codelists/opensafely-dementia.csv", system="ctv3", column="CTV3ID"
-)
-chronic_neuro_disease = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-cns_cov.csv",
-    system="snomed",
-    column="code",
-)
-learning_disability_codes = codelist_from_csv(
-    "codelists/opensafely-learning-disabilities.csv", system="ctv3", column="CTV3Code"
-)
-hypertension_dx = codelist_from_csv(
-    "codelists/opensafely-hypertension.csv", system="ctv3", column="CTV3ID"
-)
-diabetes_codes = codelist_from_csv(
-    "codelists/opensafely-diabetes.csv", system="ctv3", column="CTV3ID"
-)
-preg = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-preg.csv",
-    system="snomed",
-    column="code",
-)
-immdx_cov = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-immdx_cov.csv",
-    system="snomed",
-    column="code",
-)
-immrx = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-immrx.csv",
-    system="snomed",
-    column="code",
-)
-# # COVID codelists
-    # First COVID vaccination administration codes
-covadm1 = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-covadm1.csv",
-    system="snomed",
-    column="code",
-)
-# Second COVID vaccination administration codes
-covadm2 = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-covadm2.csv",
-    system="snomed",
-    column="code",
-)
-    #testing and cases codelist
-covid_codelist = codelist_from_csv(
-    "codelists/opensafely-covid-identification.csv",
-    system="icd10",
-    column="icd10_code",
-)
-    #admissions <- not sure if there is a codelist to connect to here?
-    #deaths
-covid_codelist = codelist(["U071", "U072"], system="icd10")
-covidconf_codelist = codelist(["U071"], system="icd10")
-# High Risk from COVID-19 code
-shield = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-shield.csv",
-    system="snomed",
-    column="code",
-)
-# Lower Risk from COVID-19 codes
-nonshield = codelist_from_csv(
-    "codelists/primis-covid19-vacc-uptake-nonshield.csv",
-    system="snomed",
-    column="code",
-)
+index_date = "2021-05-14"
+end_study_period = "2021-10-01"
 
 ## STUDY DEFINITION
 study = StudyDefinition(
@@ -128,10 +13,10 @@ study = StudyDefinition(
         "incidence": 0.5,
     },
     population=patients.registered_with_one_practice_between(
-        "2021-05-14", "2021-10-01"
+        index_date, end_study_period
     ),
     age=patients.age_as_of(
-        "2021-05-14",
+        index_date,
         return_expectations={
             "rate": "universal",
             "int": {"distribution": "population_ages"},
@@ -210,7 +95,7 @@ sex=patients.sex(
     ),
 # ICS (formerly known as STP)
  stp=patients.registered_practice_as_of(
-        "2020-02-01",
+        index_date,
         returning="stp_code",
         return_expectations={
             "rate": "universal",
@@ -231,16 +116,50 @@ sex=patients.sex(
         },
     ),
 # ethnicity 6 categories
-ethnicity=patients.with_these_clinical_events(
-    ethnicity_codes,
-        returning="category",
-        find_last_match_in_period=True,
-        include_date_of_match=True,
-        return_expectations={
-            "category": {"ratios": {"1": 0.2, "2":0.2, "3":0.2, "4":0.2, "5": 0.2}},
-            "incidence": 0.75,
-        },
-    ),
+# ethnicity=patients.with_these_clinical_events(
+#     ethnicity_codes,
+#         returning="category",
+#         find_last_match_in_period=True,
+#         include_date_of_match=True,
+#         return_expectations={
+#             "category": {"ratios": {"1": 0.2, "2":0.2, "3":0.2, "4":0.2, "5": 0.2}},
+#             "incidence": 0.75,
+#         },
+#     ),
+ethnicity = patients.categorised_as(
+            {"0": "DEFAULT",
+            "1": "eth='1' OR (NOT eth AND ethnicity_sus='1')", 
+            "2": "eth='2' OR (NOT eth AND ethnicity_sus='2')", 
+            "3": "eth='3' OR (NOT eth AND ethnicity_sus='3')", 
+            "4": "eth='4' OR (NOT eth AND ethnicity_sus='4')",  
+            "5": "eth='5' OR (NOT eth AND ethnicity_sus='5')",
+            }, 
+            return_expectations={
+            "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
+            "incidence": 0.4,
+            },
+        
+            eth=patients.with_these_clinical_events(    
+                ethnicity_codes,
+                returning="category",
+                find_last_match_in_period=True,
+                include_date_of_match=False,
+                return_expectations={
+                    "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
+                    "incidence": 0.75,
+                },
+            ),
+
+        # fill missing ethnicity from SUS
+            ethnicity_sus=patients.with_ethnicity_from_sus(
+                returning="group_6",  
+                use_most_frequent_code=True,
+                return_expectations={
+                    "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
+                    "incidence": 0.4,
+                },
+            ),
+        ),
    ethnicity_16=patients.with_these_clinical_events(
         ethnicity_codes_16,
         returning="category",
@@ -420,7 +339,7 @@ covid_admission_date=patients.admitted_to_hospital(
     ),
 ##HOUSEHOLD SIZE
     hh_id=patients.household_as_of(
-        index_date,
+        "2020-02-01",
         returning="pseudo_id",
         return_expectations={
             "int": {"distribution": "normal", "mean": 1000, "stddev": 200},
@@ -429,7 +348,7 @@ covid_admission_date=patients.admitted_to_hospital(
     ),
 
     hh_size=patients.household_as_of(
-        index_date,
+        "2020-02-01",
         returning="household_size",
         return_expectations={
             "int": {"distribution": "normal", "mean": 8, "stddev": 1},
@@ -500,9 +419,8 @@ diabetes=patients.with_these_clinical_events(
     # Dementia
 dementia=patients.with_these_clinical_events(
         dementia, 
-        return_first_date_in_period=True, 
-        include_month=True,
-        return_expectations={"date": {"latest": "2020-01-31"}},
+        returning="binary_flag",
+        on_or_before = index_date,
     ),
 # Chronic Neurological Disease including Significant Learning Disorder
 cnd=patients.with_these_clinical_events(
@@ -534,4 +452,3 @@ cnd=patients.with_these_clinical_events(
     ),
     ),
  )
-  
