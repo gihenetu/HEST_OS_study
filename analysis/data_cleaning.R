@@ -1,6 +1,6 @@
 library('tidyverse')
 
-df_input <- read_csv(
+cleaned_df <- read_csv(
   here::here("output", "input.csv"),
   col_types = cols(
   patient_id = col_integer(),
@@ -40,13 +40,9 @@ df_input <- read_csv(
   dementia = col_double(),
   cnd = col_double(),
   learning_disability = col_double(),
-  immuno_group = col_double())
-)
-
-cleaned <- filter(df_input, region == "London")
-
-
-
-utils::write.csv(
-  here::here("output", "cleaned_df.csv")
+  immuno_group = col_double())) %>%
+filter(region == "London") %>%
+filter(age >= 18) %>%
+write_rds(
+  here::here("output", "cleaned_df.RDS")
 )
