@@ -16,18 +16,18 @@ actions:
     needs: [generate_study_population]
     outputs:
       highly_sensitive:
-        csv: output/cleaned_df.csv
+        csv: output/cleaned_df.RDS
 
   describe:
     run: r:latest analysis/report.R
-    needs: [generate_study_population]
+    needs: [cleaned_study_population]
     outputs:
       moderately_sensitive:
         cohort: output/descriptive.png
 
   descriptive_figures:
     run: r:latest analysis/ethnicity_fig.R
-    needs: [generate_study_population]
+    needs: [cleaned_study_population]
     outputs:
       moderately_sensitive:
         cohort: output/eth_descriptive.png
