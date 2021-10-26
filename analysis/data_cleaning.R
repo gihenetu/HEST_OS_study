@@ -44,6 +44,6 @@ cleaned_df <- read_csv(
   immuno_group = col_double())) %>%
 filter(region == "London") %>%
 filter(age >= 18) %>%
-write_rds(
-  here::here("output", "cleaned_df.RDS")
+write_csv(
+  here::here("output", "cleaned_df.csv")
 )
