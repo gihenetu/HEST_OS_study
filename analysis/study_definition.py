@@ -12,9 +12,9 @@ study = StudyDefinition(
         "rate": "uniform",
         "incidence": 0.5,
     },
-    population=patients.registered_with_one_practice_between(
-        index_date, end_study_period
-    ),
+    # population=patients.registered_with_one_practice_between(
+    #     index_date, end_study_period
+    # ),
     age=patients.age_as_of(
         index_date,
         return_expectations={
@@ -74,6 +74,18 @@ sex=patients.sex(
             },
         ),
 # region
+     population=patients.satisfying(
+        """
+        registered
+        AND
+        region='London'
+        AND 
+        age >= 18
+        """,
+            registered=patients.registered_with_one_practice_between(
+            index_date, end_study_period,
+            ),
+        ),
     region=patients.registered_practice_as_of(
         index_date,
         returning="nuts1_region_name",
