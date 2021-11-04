@@ -127,17 +127,6 @@ sex=patients.sex(
             },
         },
     ),
-# ethnicity 6 categories
-# ethnicity=patients.with_these_clinical_events(
-#     ethnicity_codes,
-#         returning="category",
-#         find_last_match_in_period=True,
-#         include_date_of_match=True,
-#         return_expectations={
-#             "category": {"ratios": {"1": 0.2, "2":0.2, "3":0.2, "4":0.2, "5": 0.2}},
-#             "incidence": 0.75,
-#         },
-#     ),
 ethnicity = patients.categorised_as(
             {"0": "DEFAULT",
             "1": "eth='1' OR (NOT eth AND ethnicity_sus='1')", 
@@ -203,7 +192,7 @@ ethnicity = patients.categorised_as(
     ),
 ## COVID-19 variables
 # # covid testing
-    sgss_covid19_date=patients.with_test_result_in_sgss(
+    sgss_covid19_any_test=patients.with_test_result_in_sgss(
         pathogen="SARS-CoV-2",
         returning="date",
         find_first_match_in_period=True,
@@ -238,23 +227,23 @@ ethnicity = patients.categorised_as(
     died_ons_covid_flag_any=patients.with_these_codes_on_death_certificate(
         covid_codelist,
         match_only_underlying_cause=False,
-        return_expectations={"date": {"earliest": "2020-03-01"}},
+        return_expectations={"date": {"earliest": index_date}},
     ),
     died_ons_covid_flag_underlying=patients.with_these_codes_on_death_certificate(
         covid_codelist,
         match_only_underlying_cause=True,
-        return_expectations={"date": {"earliest": "2020-03-01"}},
+        return_expectations={"date": {"earliest": index_date}},
     ),
     died_ons_covidconf_flag_underlying=patients.with_these_codes_on_death_certificate(
         covidconf_codelist,
         match_only_underlying_cause=True,
-        return_expectations={"date": {"earliest": "2020-03-01"}},
+        return_expectations={"date": {"earliest": index_date}},
     ),
     died_date_ons=patients.died_from_any_cause(
         returning="date_of_death",
         include_month=True,
         include_day=True,
-        return_expectations={"date": {"earliest": "2020-03-01"}},
+        return_expectations={"date": {"earliest": index_date}},
     ),
 # admission due to covid
 covid_admission_date=patients.admitted_to_hospital(
@@ -406,7 +395,7 @@ chronic_respiratory_disease=patients.with_these_clinical_events(
         return_expectations={"date": {"earliest": index_date}},
     ),
 #     preg (compare by months)
-        preg_36wks_date=patients.with_these_clinical_events(
+        preg_36wks=patients.with_these_clinical_events(
             preg,
             returning="binary_flag",
             find_last_match_in_period=True,
