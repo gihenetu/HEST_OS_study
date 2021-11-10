@@ -2,8 +2,7 @@
 library(tidyverse)
 library(data.table)
 library(janitor)
-library(arsenal)
-library(questionr)
+library(gtsummary)
 
 #Load in data and clean variables
 input <- read_csv(
@@ -36,33 +35,79 @@ cleaned_input <- input %>%
 #Restrict to data needed
 cleaned_df <- cleaned_input[c(9:11, 13:24, 26:38)]
 
-#create tables
-missing <- freq.na(cleaned_df)
+##create tables
+#Table 1 by 2nd dose vaccination status
+table1 <- cleaned_df %>%
+  tbl_summary(
+    by = cov_vacc_d2,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    missing_text = "(Missing)"
+  )
 
-table_one <- tableby(cov_vacc_d2 ~ ., data = cleaned_df) 
-summary(table_one, title = "Table 1 by 2nd dose vaccination status")
+#Table 1.1 by ethnicity
+table11 <- cleaned_df %>%
+  tbl_summary(
+    by = ethnicity,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    missing_text = "(Missing)"
+  )
 
-table_one_one <- tableby(ethnicity ~ ., data = cleaned_df) 
-summary(table_one_one, title = "Table 1.1 by ethnicity")
+#Table 1.2 by LD
+table12 <- cleaned_df %>%
+  tbl_summary(
+    by = learning_disability,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    missing_text = "(Missing)"
+  )
 
-table_one_two <- tableby(learning_disability ~ ., data = cleaned_df) 
-summary(table_one_two, title = "Table 1.2 by LD")
+#Table 1.3 by Admission
+table13 <- cleaned_df %>%
+  tbl_summary(
+    by = covid_admission_primary_diagnosis,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    missing_text = "(Missing)"
+  )
 
-table_one_three <- tableby(covid_admission_primary_diagnosis ~ ., data = cleaned_df) 
-summary(table_one_three, title = "Table 1.3 by Admission")
+#Table 1.4 by Mortality
+table14 <- cleaned_df %>%
+  tbl_summary(
+    by = died_ons_covid_flag_any,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    missing_text = "(Missing)"
+  )
 
-table_one_four <- tableby(died_ons_covid_flag_any ~ ., data = cleaned_df) 
-summary(table_one_four, title = "Table 1.4 by Mortality")
+#Read into html files
+table1 %>%
+  as_gt() %>%
+  gt::gtsave(filename = "table1.html")
 
-# table_one_five <- tableby(learning_disability ~ ., data = cleaned_df) 
-# summary(table_one_five, title = "Table 1.5 by COVID-19 case status")
+table11 %>%
+  as_gt() %>%
+  gt::gtsave(filename = "table1-1.html")
+
+table12 %>%
+  as_gt() %>%
+  gt::gtsave(filename = "table1-2.html")
+
+table13 %>%
+  as_gt() %>%
+  gt::gtsave(filename = "table1-3.html")
+
+table14 %>%
+  as_gt() %>%
+  gt::gtsave(filename = "table1-4.html")
 
 
 
-#Read into word documents
-write2word(missing, "~/Missing.doc", title="Missing values")
-write2word(table_one, "~/Table1.doc", title="Table 1 by 2nd dose vaccination status")
-write2word(table_one_one, "~/Table1-1.doc", title="Table 1.1 by ethnicity")
-write2word(table_one_two, "~/Table1-2.doc", title="Table 1.2 by learning disability status")
-write2word(table_one_three, "~/Table1-3.doc", title="Table 1.3 by admission")
-write2word(table_one_four, "~/Table1-4.doc", title="Table 1.4 by mortality")
+
+
