@@ -22,6 +22,38 @@ study = StudyDefinition(
             "int": {"distribution": "population_ages"},
         },
     ),
+    population=patients.satisfying(
+        """
+        registered
+        AND
+        region='London'
+        AND 
+        age >= 18
+        """,
+            registered=patients.registered_with_one_practice_between(
+            index_date, end_study_period,
+            ),
+# region
+    region=patients.registered_practice_as_of(
+        index_date,
+        returning="nuts1_region_name",
+        return_expectations={
+            "rate": "universal",
+            "category": {
+                "ratios": {
+                    "North East": 0.1,
+                    "North West": 0.1,
+                    "Yorkshire and the Humber": 0.1,
+                    "East Midlands": 0.1,
+                    "West Midlands": 0.1,
+                    "East of England": 0.1,
+                    "London": 0.2,
+                    "South East": 0.2,
+                },
+            },
+        },
+    ),
+    ),
     # sex 
 sex=patients.sex(
     return_expectations={
@@ -73,38 +105,6 @@ sex=patients.sex(
                 },
             },
         ),
-# region
-     population=patients.satisfying(
-        """
-        registered
-        AND
-        region='London'
-        AND 
-        age >= 18
-        """,
-            registered=patients.registered_with_one_practice_between(
-            index_date, end_study_period,
-            ),
-        ),
-    region=patients.registered_practice_as_of(
-        index_date,
-        returning="nuts1_region_name",
-        return_expectations={
-            "rate": "universal",
-            "category": {
-                "ratios": {
-                    "North East": 0.1,
-                    "North West": 0.1,
-                    "Yorkshire and the Humber": 0.1,
-                    "East Midlands": 0.1,
-                    "West Midlands": 0.1,
-                    "East of England": 0.1,
-                    "London": 0.2,
-                    "South East": 0.2,
-                },
-            },
-        },
-    ),
 # ICS (formerly known as STP)
  stp=patients.registered_practice_as_of(
         index_date,

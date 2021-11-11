@@ -89,23 +89,23 @@ table14 <- cleaned_df %>%
 #Read into html files
 table1 %>%
   as_gt() %>%
-  gt::gtsave(filename = "Table1.html")
+  gt::gtsave(filename = "Table1.html", path=here::here("output"))
 
 table11 %>%
   as_gt() %>%
-  gt::gtsave(filename = "Table1-1.html")
+  gt::gtsave(filename = "Table1-1.html", path=here::here("output"))
 
 table12 %>%
   as_gt() %>%
-  gt::gtsave(filename = "Table1-2.html")
+  gt::gtsave(filename = "Table1-2.html", path=here::here("output"))
 
 table13 %>%
   as_gt() %>%
-  gt::gtsave(filename = "Table1-3.html")
+  gt::gtsave(filename = "Table1-3.html", path=here::here("output"))
 
 table14 %>%
   as_gt() %>%
-  gt::gtsave(filename = "Table1-4.html")
+  gt::gtsave(filename = "Table1-4.html", path=here::here("output"))
 
 
 

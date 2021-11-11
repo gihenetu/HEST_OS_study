@@ -23,8 +23,8 @@ actions:
     needs: [generate_study_population]
     outputs:
       moderately_sensitive:
-        table_one: Table1.html
-        table_one_one: Table1-1.html
-        table_one_two: Table1-2.html
-        table_one_three: Table1-3.html
-        table_one_four: Table1-4.html
+        table_one: output/Table1.html
+        table_one_one: output/Table1-1.html
+        table_one_two: output/Table1-2.html
+        table_one_three: output/Table1-3.html
+        table_one_four: output/Table1-4.html
