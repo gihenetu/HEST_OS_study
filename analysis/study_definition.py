@@ -19,6 +19,34 @@ study = StudyDefinition(
             "int": {"distribution": "population_ages"},
         },
     ),
+    demographic_variables = dict(
+    age_group=patients.categorised_as(
+        {
+            "0-17": "age < 18",
+            "18-24": "age >= 18 AND age < 25",
+            "25-34": "age >= 25 AND age < 35",
+            "35-44": "age >= 35 AND age < 45",
+            "45-54": "age >= 45 AND age < 55",
+            "55-69": "age >= 55 AND age < 70",
+            "70-79": "age >= 70 AND age < 80",
+            "80+": "age >= 80",
+            "missing": "DEFAULT",
+        },
+        return_expectations={
+            "rate": "universal",
+            "category": {
+                "ratios": {
+                    "0-17": 0.1,
+                    "18-24": 0.1,
+                    "25-34": 0.1,
+                    "35-44": 0.1,
+                    "45-54": 0.2,
+                    "55-69": 0.2,
+                    "70-79": 0.1,
+                    "80+": 0.1,
+                }
+            },
+        },
     population=patients.satisfying(
         """
         registered
@@ -396,7 +424,7 @@ chronic_respiratory_disease=patients.with_these_clinical_events(
             preg,
             returning="binary_flag",
             find_last_match_in_period=True,
-            # between=["index_date - 252 days", "index_date - 1 day"],
+            between=["2020-09-05", "2021-05-13"],
             date_format="YYYY-MM-DD",
         ),
         # Chronic heart disease codes
