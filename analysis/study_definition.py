@@ -2,11 +2,12 @@ from cohortextractor import StudyDefinition, patients, codelist, codelist_from_c
 
 from codelists import *
 
-index_date = "2021-05-14"
 end_study_period = "2021-10-01"
+index_date="2021-05-14"
 
 ## STUDY DEFINITION
 study = StudyDefinition(
+    index_date=index_date,
     default_expectations={
         "date": {"earliest": "1900-01-01", "latest": "today"},
         "rate": "uniform",
@@ -19,7 +20,6 @@ study = StudyDefinition(
             "int": {"distribution": "population_ages"},
         },
     ),
-    demographic_variables = dict(
     age_group=patients.categorised_as(
         {
             "0-17": "age < 18",
@@ -47,6 +47,7 @@ study = StudyDefinition(
                 }
             },
         },
+    ),
     population=patients.satisfying(
         """
         registered
@@ -424,7 +425,7 @@ chronic_respiratory_disease=patients.with_these_clinical_events(
             preg,
             returning="binary_flag",
             find_last_match_in_period=True,
-            between=["2020-09-05", "2021-05-13"],
+            between=["index_date - 252 days", "index_date - 1 day"],
             date_format="YYYY-MM-DD",
         ),
         # Chronic heart disease codes
