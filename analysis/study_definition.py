@@ -12,9 +12,6 @@ study = StudyDefinition(
         "rate": "uniform",
         "incidence": 0.5,
     },
-    # population=patients.registered_with_one_practice_between(
-    #     index_date, end_study_period
-    # ),
     age=patients.age_as_of(
         index_date,
         return_expectations={
