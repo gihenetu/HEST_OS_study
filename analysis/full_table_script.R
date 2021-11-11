@@ -11,7 +11,23 @@ input <- read_csv(
 cleaned_input <- input %>%
   mutate(imd=factor(imd, levels=c(1,2,3,4,5), labels=c("1 - Most deprived", "2", "3", "4", "5 - Least deprived"))) %>%
   mutate(ethnicity=factor(ethnicity, levels=c(1,2,3,4,5), labels=c("White", "Mixed", "Asian", "Black", "Other"))) %>%
-  mutate(ethnicity_16=factor(ethnicity_16, levels=c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16), labels=c("1","2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"))) %>%
+  mutate(ethnicity_16=factor(ethnicity_16, levels=c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16), 
+  labels=c("British or Mixed British",
+  "Irish", 
+  "Other White", 
+  "White and Black Caribbean", 
+  "White and Black African", 
+  "White and Asian", 
+  "Other Mixed", 
+  "Indian or British Indian", 
+  "Pakistani or British Pakistani", 
+  "Bangladeshi or British Bangladeshi", 
+  "Other Asian", 
+  "Caribbean", 
+  "African", 
+  "Other Black", 
+  "Chinese", 
+  "Other"))) %>%
   mutate(died_ons_covid_flag_any=factor(died_ons_covid_flag_any, levels = c(0,1), labels=c("No", "Yes"))) %>%
   mutate(died_ons_covid_flag_underlying=factor(died_ons_covid_flag_underlying, levels=c(0,1), labels=c("No", "Yes"))) %>%
   mutate(died_ons_covidconf_flag_underlying=factor(died_ons_covidconf_flag_underlying, levels=c(0,1), labels=c("No", "Yes"))) %>%
