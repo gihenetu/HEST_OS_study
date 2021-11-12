@@ -102,6 +102,16 @@ table14 <- cleaned_df %>%
     missing_text = "(Missing)"
   )
 
+#Table 1.5 by Pregnancy
+table15 <- cleaned_df %>%
+  tbl_summary(
+    by = preg_36wks,
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{n} / {N} ({p}%)"),
+    digits = all_continuous() ~ 2,
+    missing_text = "(Missing)"
+  )
+
 #Read into html files
 table1 %>%
   as_gt() %>%
@@ -123,6 +133,9 @@ table14 %>%
   as_gt() %>%
   gt::gtsave(filename = "Table1-4.html", path=here::here("output"))
 
+table15 %>%
+  as_gt() %>%
+  gt::gtsave(filename = "Table1-5.html", path=here::here("output"))
 
 
 
