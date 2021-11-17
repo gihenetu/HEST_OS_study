@@ -56,104 +56,104 @@ study = StudyDefinition(
         AND 
         age >= 18
         """,
-            registered=patients.registered_with_one_practice_between(
+        registered=patients.registered_with_one_practice_between(
             index_date, end_study_period,
-            ),
-# region
-    region=patients.registered_practice_as_of(
-        index_date,
-        returning="nuts1_region_name",
-        return_expectations={
-            "rate": "universal",
-            "category": {
-                "ratios": {
-                    "North East": 0.1,
-                    "North West": 0.1,
-                    "Yorkshire and the Humber": 0.1,
-                    "East Midlands": 0.1,
-                    "West Midlands": 0.1,
-                    "East of England": 0.1,
-                    "London": 0.2,
-                    "South East": 0.2,
-                },
-            },
-        },
-    ),
-    ),
-    # sex 
-sex=patients.sex(
-    return_expectations={
-        "rate": "universal",
-        "category": {"ratios": {"M": 0.49, "F": 0.51}},
-        }
-    ),
-    #deprivation
-        imd=patients.categorised_as(
-            {
-                "0": "DEFAULT",
-                "1": """
-                        index_of_multiple_deprivation >=1
-                    AND index_of_multiple_deprivation < 32844*1/5
-                    """,
-                "2": """
-                        index_of_multiple_deprivation >= 32844*1/5
-                    AND index_of_multiple_deprivation < 32844*2/5
-                    """,
-                "3": """
-                        index_of_multiple_deprivation >= 32844*2/5
-                    AND index_of_multiple_deprivation < 32844*3/5
-                    """,
-                "4": """
-                        index_of_multiple_deprivation >= 32844*3/5
-                    AND index_of_multiple_deprivation < 32844*4/5
-                    """,
-                "5": """
-                        index_of_multiple_deprivation >= 32844*4/5
-                    AND index_of_multiple_deprivation < 32844
-                    """,
-            },
-            index_of_multiple_deprivation=patients.address_as_of(
-                index_date,
-                returning="index_of_multiple_deprivation",
-                round_to_nearest=100,
-            ),
+        ),
+        # region
+        region=patients.registered_practice_as_of(
+            index_date,
+            returning="nuts1_region_name",
             return_expectations={
                 "rate": "universal",
                 "category": {
                     "ratios": {
-                        "0": 0.05,
-                        "1": 0.19,
-                        "2": 0.19,
-                        "3": 0.19,
-                        "4": 0.19,
-                        "5": 0.19,
-                    }
+                        "North East": 0.1,
+                        "North West": 0.1,
+                        "Yorkshire and the Humber": 0.1,
+                        "East Midlands": 0.1,
+                        "West Midlands": 0.1,
+                        "East of England": 0.1,
+                        "London": 0.2,
+                        "South East": 0.2,
+                    },
                 },
             },
         ),
-# ICS (formerly known as STP)
- stp=patients.registered_practice_as_of(
-        index_date,
-        returning="stp_code",
+    ),
+    # sex 
+    sex=patients.sex(
+        return_expectations={
+            "rate": "universal",
+            "category": {"ratios": {"M": 0.49, "F": 0.51}},
+            }
+    ),
+    #deprivation
+    imd=patients.categorised_as(
+        {
+            "0": "DEFAULT",
+            "1": """
+                    index_of_multiple_deprivation >=1
+                AND index_of_multiple_deprivation < 32844*1/5
+                """,
+            "2": """
+                    index_of_multiple_deprivation >= 32844*1/5
+                AND index_of_multiple_deprivation < 32844*2/5
+                """,
+            "3": """
+                    index_of_multiple_deprivation >= 32844*2/5
+                AND index_of_multiple_deprivation < 32844*3/5
+                """,
+            "4": """
+                    index_of_multiple_deprivation >= 32844*3/5
+                AND index_of_multiple_deprivation < 32844*4/5
+                """,
+            "5": """
+                    index_of_multiple_deprivation >= 32844*4/5
+                AND index_of_multiple_deprivation < 32844
+                """,
+        },
+        index_of_multiple_deprivation=patients.address_as_of(
+            index_date,
+            returning="index_of_multiple_deprivation",
+            round_to_nearest=100,
+        ),
         return_expectations={
             "rate": "universal",
             "category": {
                 "ratios": {
-                    "STP1": 0.1,
-                    "STP2": 0.1,
-                    "STP3": 0.1,
-                    "STP4": 0.1,
-                    "STP5": 0.1,
-                    "STP6": 0.1,
-                    "STP7": 0.1,
-                    "STP8": 0.1,
-                    "STP9": 0.1,
-                    "STP10": 0.1,
+                    "0": 0.05,
+                    "1": 0.19,
+                    "2": 0.19,
+                    "3": 0.19,
+                    "4": 0.19,
+                    "5": 0.19,
                 }
             },
         },
     ),
-ethnicity = patients.categorised_as(
+# # ICS (formerly known as STP)
+#     stp=patients.registered_practice_as_of(
+#             index_date,
+#             returning="stp_code",
+#             return_expectations={
+#                 "rate": "universal",
+#                 "category": {
+#                     "ratios": {
+#                         "STP1": 0.1,
+#                         "STP2": 0.1,
+#                         "STP3": 0.1,
+#                         "STP4": 0.1,
+#                         "STP5": 0.1,
+#                         "STP6": 0.1,
+#                         "STP7": 0.1,
+#                         "STP8": 0.1,
+#                         "STP9": 0.1,
+#                         "STP10": 0.1,
+#                     }
+#                 },
+#             },
+#     ),
+    ethnicity = patients.categorised_as(
             {"0": "DEFAULT",
             "1": "eth='1' OR (NOT eth AND ethnicity_sus='1')", 
             "2": "eth='2' OR (NOT eth AND ethnicity_sus='2')", 
@@ -161,11 +161,11 @@ ethnicity = patients.categorised_as(
             "4": "eth='4' OR (NOT eth AND ethnicity_sus='4')",  
             "5": "eth='5' OR (NOT eth AND ethnicity_sus='5')",
             }, 
-            return_expectations={
-            "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
-            "incidence": 0.4,
-            },
-        
+                return_expectations={
+                "category": {"ratios": {"1": 0.2, "2": 0.2, "3": 0.2, "4": 0.2, "5": 0.2}},
+                "incidence": 0.4,
+                },
+            
             eth=patients.with_these_clinical_events(    
                 ethnicity_codes,
                 returning="category",
@@ -186,35 +186,105 @@ ethnicity = patients.categorised_as(
                     "incidence": 0.4,
                 },
             ),
-        ),
-   ethnicity_16=patients.with_these_clinical_events(
-        ethnicity_codes_16,
-        returning="category",
-        find_last_match_in_period=True,
-        include_date_of_match=True,
-        return_expectations={
-            "category": {
-                "ratios": {
-                    "1": 0.0625,
-                    "2": 0.0625,
-                    "3": 0.0625,
-                    "4": 0.0625,
-                    "5": 0.0625,
-                    "6": 0.0625,
-                    "7": 0.0625,
-                    "8": 0.0625,
-                    "9": 0.0625,
-                    "10": 0.0625,
-                    "11": 0.0625,
-                    "12": 0.0625,
-                    "13": 0.0625,
-                    "14": 0.0625,
-                    "15": 0.0625,
-                    "16": 0.0625,
-                }
-            },
-            "incidence": 0.75,
-        },
+    ),
+    ethnicity_16=patients.categorised_as(
+            {"0": "DEFAULT",
+            "1": "eth16='1' OR (NOT eth16 AND ethnicity_sus16='1')", 
+            "2": "eth16='2' OR (NOT eth16 AND ethnicity_sus16='2')", 
+            "3": "eth16='3' OR (NOT eth16 AND ethnicity_sus16='3')", 
+            "4": "eth16='4' OR (NOT eth16 AND ethnicity_sus16='4')",  
+            "5": "eth16='5' OR (NOT eth16 AND ethnicity_sus16='5')",
+            "6": "eth16='6' OR (NOT eth16 AND ethnicity_sus16='6')",
+            "7": "eth16='7' OR (NOT eth16 AND ethnicity_sus16='7')",
+            "8": "eth16='8' OR (NOT eth16 AND ethnicity_sus16='8')",
+            "9": "eth16='9' OR (NOT eth16 AND ethnicity_sus16='9')",
+            "10": "eth16='10' OR (NOT eth16 AND ethnicity_sus16='10')",
+            "11": "eth16='11' OR (NOT eth16 AND ethnicity_sus16='11')",
+            "12": "eth16='12' OR (NOT eth16 AND ethnicity_sus16='12')",
+            "13": "eth16='13' OR (NOT eth16 AND ethnicity_sus16='13')",
+            "14": "eth16='14' OR (NOT eth16 AND ethnicity_sus16='14')",
+            "15": "eth16='15' OR (NOT eth16 AND ethnicity_sus16='15')",
+            "16": "eth16='16' OR (NOT eth16 AND ethnicity_sus16='16')",
+            }, 
+                return_expectations={
+                        "category": {
+                            "ratios": {
+                                "1": 0.0625,
+                                "2": 0.0625,
+                                "3": 0.0625,
+                                "4": 0.0625,
+                                "5": 0.0625,
+                                "6": 0.0625,
+                                "7": 0.0625,
+                                "8": 0.0625,
+                                "9": 0.0625,
+                                "10": 0.0625,
+                                "11": 0.0625,
+                                "12": 0.0625,
+                                "13": 0.0625,
+                                "14": 0.0625,
+                                "15": 0.0625,
+                                "16": 0.0625,
+                            }
+                        },
+                        "incidence": 0.75,
+                    },
+            eth16=patients.with_these_clinical_events(
+                ethnicity_codes_16,
+                returning="category",
+                find_last_match_in_period=True,
+                include_date_of_match=True,
+                return_expectations={
+                    "category": {
+                        "ratios": {
+                            "1": 0.0625,
+                            "2": 0.0625,
+                            "3": 0.0625,
+                            "4": 0.0625,
+                            "5": 0.0625,
+                            "6": 0.0625,
+                            "7": 0.0625,
+                            "8": 0.0625,
+                            "9": 0.0625,
+                            "10": 0.0625,
+                            "11": 0.0625,
+                            "12": 0.0625,
+                            "13": 0.0625,
+                            "14": 0.0625,
+                            "15": 0.0625,
+                            "16": 0.0625,
+                        }
+                    },
+                    "incidence": 0.75,
+                },
+            ),
+            ethnicity_sus16=patients.with_ethnicity_from_sus(
+                returning="group_16",  
+                use_most_frequent_code=True,
+                return_expectations={
+                    "category": {
+                        "ratios": {
+                            "1": 0.0625,
+                            "2": 0.0625,
+                            "3": 0.0625,
+                            "4": 0.0625,
+                            "5": 0.0625,
+                            "6": 0.0625,
+                            "7": 0.0625,
+                            "8": 0.0625,
+                            "9": 0.0625,
+                            "10": 0.0625,
+                            "11": 0.0625,
+                            "12": 0.0625,
+                            "13": 0.0625,
+                            "14": 0.0625,
+                            "15": 0.0625,
+                            "16": 0.0625,
+                        }
+                    },
+                    "incidence": 0.75,
+                },
+            ),
     ),
 ## COVID-19 variables
 # # covid testing
@@ -245,7 +315,7 @@ ethnicity = patients.categorised_as(
         },
     ),
 # # covid deaths
-   died_date_cpns=patients.with_death_recorded_in_cpns(
+    died_date_cpns=patients.with_death_recorded_in_cpns(
         returning="date_of_death",
         include_month=True,
         include_day=True,
@@ -272,14 +342,14 @@ ethnicity = patients.categorised_as(
         return_expectations={"date": {"earliest": index_date}},
     ),
 # admission due to covid
-covid_admission_date=patients.admitted_to_hospital(
+    covid_admission_date=patients.admitted_to_hospital(
         returning= "binary_flag", 
         with_these_diagnoses=covid_codelist,
         on_or_after= index_date,
         find_first_match_in_period=True,  
         date_format="YYYY-MM-DD",  
         return_expectations={"date": {"earliest": index_date}, "incidence" : 0.25},
-   ),
+    ),
     covid_admission_primary_diagnosis=patients.admitted_to_hospital(
         returning="primary_diagnosis",
         with_these_diagnoses=covid_codelist,
@@ -290,7 +360,7 @@ covid_admission_date=patients.admitted_to_hospital(
             "category": {"ratios": {"U071":0.5, "U072":0.5}},
         },
     ),
-  patient_index_date=patients.admitted_to_hospital(
+    patient_index_date=patients.admitted_to_hospital(
         returning="date_discharged",
         with_these_diagnoses=covid_codelist,
         on_or_after=index_date,
@@ -380,7 +450,7 @@ covid_admission_date=patients.admitted_to_hospital(
     ),
 ## COMORBIDITIES 
 #    BMI
-bmi=patients.most_recent_bmi(
+    bmi=patients.most_recent_bmi(
         between=["2010-02-01", end_study_period],
         minimum_age_at_measurement=16,
         include_measurement_date=False,
@@ -392,7 +462,7 @@ bmi=patients.most_recent_bmi(
         },
     ),
 #     smoking
-smoking_status=patients.with_these_clinical_events(
+    smoking_status=patients.with_these_clinical_events(
         smoking,
         returning = "binary_flag",
         on_or_before= index_date,
@@ -400,14 +470,14 @@ smoking_status=patients.with_these_clinical_events(
         # include_month=True,
     ),
 ## Asthma
-asthma=patients.with_these_clinical_events(
+    asthma=patients.with_these_clinical_events(
         asthma_dx,
         returning = "binary_flag",
         on_or_before = index_date,
         return_first_date_in_period=False,
     ),
 # #Chronic respiratory disease
-chronic_respiratory_disease=patients.with_these_clinical_events(
+    chronic_respiratory_disease=patients.with_these_clinical_events(
         chronic_respiratory_disease_codes,
         returning = "binary_flag",
         on_or_before = index_date,
@@ -421,57 +491,57 @@ chronic_respiratory_disease=patients.with_these_clinical_events(
         return_expectations={"date": {"earliest": index_date}},
     ),
 #     preg (compare by months)
-        preg_36wks=patients.with_these_clinical_events(
+    preg_36wks=patients.with_these_clinical_events(
             preg,
             returning="binary_flag",
             find_last_match_in_period=True,
             between=["index_date - 252 days", "index_date - 1 day"],
             date_format="YYYY-MM-DD",
-        ),
+    ),
         # Chronic heart disease codes
-chronic_cardiac_disease=patients.with_these_clinical_events(
+    chronic_cardiac_disease=patients.with_these_clinical_events(
         chronic_cardiac_disease_codes,
         returning= "binary_flag",
         on_or_before= index_date,
     ),
-diabetes=patients.with_these_clinical_events(
+    diabetes=patients.with_these_clinical_events(
         diabetes_codes,
         returning= "binary_flag",
         on_or_before = index_date,
     ),
     # Dementia
-dementia=patients.with_these_clinical_events(
+    dementia=patients.with_these_clinical_events(
         dementia, 
         returning="binary_flag",
         on_or_before = index_date,
     ),
 # Chronic Neurological Disease including Significant Learning Disorder
-cnd=patients.with_these_clinical_events(
-    chronic_neuro_disease,
-    returning="binary_flag",
-    on_or_before=index_date,
+    cnd=patients.with_these_clinical_events(
+        chronic_neuro_disease,
+        returning="binary_flag",
+        on_or_before=index_date,
     ),
 #   Learning Disabilities
-  learning_disability = patients.with_these_clinical_events(
-    learning_disability_codes,
-    on_or_before = index_date,
-    returning = "binary_flag",
-    return_expectations = {"incidence": 0.2}
-  ),
+    learning_disability = patients.with_these_clinical_events(
+        learning_disability_codes,
+        on_or_before = index_date,
+        returning = "binary_flag",
+        return_expectations = {"incidence": 0.2}
+    ),
 #  immunosuppressed
     immuno_group=patients.satisfying(
         "immrx OR immdx", 
         # immunosuppression diagnosis codes
-    immdx=patients.with_these_clinical_events(
-        immdx_cov,
-        returning="binary_flag",
-        on_or_before= index_date,
-        ),
-#     immuno-suppressant medications
-     immrx=patients.with_these_medications(
-        immrx,
-        returning="binary_flag",
-        on_or_before= index_date,
-        ),
+        immdx=patients.with_these_clinical_events(
+            immdx_cov,
+            returning="binary_flag",
+            on_or_before= index_date,
+            ),
+    #     immuno-suppressant medications
+        immrx=patients.with_these_medications(
+            immrx,
+            returning="binary_flag",
+            on_or_before= index_date,
+            ),
     ),
- )
+)
