@@ -34,8 +34,8 @@ cleaned_input <- input %>%
   mutate(covid_admission_date=factor(covid_admission_date, levels=c(0,1), labels=c("No", "Yes"))) %>%
   mutate(cov_vacc_d1=factor(cov_vacc_d1, levels=c(0,1), labels=c("No", "Yes"))) %>%
   mutate(cov_vacc_d2=factor(cov_vacc_d2, levels=c(0,1), labels=c("No", "Yes"))) %>%
-  mutate(shield_dat=factor(shield_dat, levels=c(0,1), labels=c("No", "Yes"))) %>%
-  mutate(nonshield_dat=factor(nonshield_dat, levels=c(0,1), labels=c("No", "Yes"))) %>%
+  # mutate(shield_dat=factor(shield_dat, levels=c(0,1), labels=c("No", "Yes"))) %>%
+  # mutate(nonshield_dat=factor(nonshield_dat, levels=c(0,1), labels=c("No", "Yes"))) %>%
   mutate(smoking_status=factor(smoking_status, levels=c(0,1), labels=c("No", "Yes"))) %>%
   mutate(asthma=factor(asthma, levels=c(0,1), labels=c("No", "Yes"))) %>%
   mutate(chronic_respiratory_disease=factor(chronic_respiratory_disease, levels=c(0,1), labels=c("No", "Yes"))) %>%
