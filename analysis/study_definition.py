@@ -415,21 +415,21 @@ study = StudyDefinition(
         date_format="YYYY-MM-DD",
     ),
     # Those COVID-19 shielding
-    shield_dat=patients.with_these_clinical_events(
-        shield,
-        returning="binary_flag",
-        find_last_match_in_period=True,
-        on_or_before=index_date,
-        date_format="YYYY-MM-DD",
-    ),
+#    shield_dat=patients.with_these_clinical_events(
+#        shield,
+#        returning="binary_flag",
+#        find_last_match_in_period=True,
+#        on_or_before=index_date,
+#        date_format="YYYY-MM-DD",
+#    ),
     # People that are not shielding
-    nonshield_dat=patients.with_these_clinical_events(
-        nonshield,
-        returning="binary_flag",
-        find_last_match_in_period=True,
-        on_or_before=index_date,
-        date_format="YYYY-MM-DD",
-    ),
+#    nonshield_dat=patients.with_these_clinical_events(
+#        nonshield,
+#        returning="binary_flag",
+#        find_last_match_in_period=True,
+#        on_or_before=index_date,
+#        date_format="YYYY-MM-DD",
+#    ),
 ##HOUSEHOLD SIZE
     hh_id=patients.household_as_of(
         "2020-02-01",
