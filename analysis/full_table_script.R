@@ -49,7 +49,8 @@ cleaned_input <- input %>%
   mutate(immuno_group=factor(immuno_group, levels=c(0,1), labels=c("No", "Yes")))
 
 #Restrict to data needed
-cleaned_df <- cleaned_input[c(9:11, 13:24, 26:38)]
+cleaned_df <- cleaned_input[c(9:length(cleaned_input))] %>%
+select(-c(hh_id,hh_size)) 
 
 ##create tables
 #Table 1 by 2nd dose vaccination status
