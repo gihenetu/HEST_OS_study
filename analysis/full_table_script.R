@@ -50,7 +50,8 @@ cleaned_input <- input %>%
 
 #Restrict to data needed
 cleaned_df <- cleaned_input[c(9:length(cleaned_input))] %>%
-select(-c(hh_id,hh_size)) 
+select(-c(hh_id,hh_size,sgss_covid19_pos_test,covadm1_dat)) 
+
 
 ##create tables
 #Table 1 by 2nd dose vaccination status
