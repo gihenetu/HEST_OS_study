@@ -55,7 +55,6 @@ cleaned_df <- cleaned_input %>%
 	select(-c(sgss_covid19_pos_test,died_date_cpns,died_date_ons)) %>%
 	select(-c(patient_index_date,exposure_hospitalisation,covadm1_dat))
 
-
 ##create tables
 #Table 1 by 2nd dose vaccination status
 table1 <- cleaned_df %>%
