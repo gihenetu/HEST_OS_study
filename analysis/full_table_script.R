@@ -51,9 +51,9 @@ cleaned_input <- input %>%
 #Restrict to data needed
 cleaned_df <- cleaned_input %>%
 select(-c(hh_id,hh_size)) %>%
-select (-c(patient_id,sgss_covid19_any_test)) %>%
-select (-c(sgss_covid19_pos_test,died_date_cpns,died_date_ons)) %>%
-select (-c(patient_index_date,exposure_hospitalisation,covadm1_dat))
+select(-c(patient_id,sgss_covid19_any_test)) %>%
+select(-c(sgss_covid19_pos_test,died_date_cpns,died_date_ons)) %>%
+select(-c(patient_index_date,exposure_hospitalisation,covadm1_dat))
 
 ##create tables
 #Table 1 by 2nd dose vaccination status
